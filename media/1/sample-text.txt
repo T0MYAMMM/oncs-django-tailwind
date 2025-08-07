@@ -1,0 +1,8 @@
+Sample Text File
+
+- Line 1
+- Line 2
+- Line 3
+
+For support:
+https://app-generator.dev/ticket/create/?product=39

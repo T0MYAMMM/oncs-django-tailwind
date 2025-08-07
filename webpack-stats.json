@@ -1,0 +1,21 @@
+{
+  "status": "done",
+  "assets": {
+    "frontend-bd4f7561b79d2d6be6e8.js": {
+      "name": "frontend-bd4f7561b79d2d6be6e8.js",
+      "path": "D:\\work\\repo-rocket\\priv-rocket-django-pro\\frontend\\static\\frontend\\frontend-bd4f7561b79d2d6be6e8.js",
+      "publicPath": "static/frontend/frontend-bd4f7561b79d2d6be6e8.js"
+    },
+    "frontend-bd4f7561b79d2d6be6e8.js.LICENSE.txt": {
+      "name": "frontend-bd4f7561b79d2d6be6e8.js.LICENSE.txt",
+      "path": "D:\\work\\repo-rocket\\priv-rocket-django-pro\\frontend\\static\\frontend\\frontend-bd4f7561b79d2d6be6e8.js.LICENSE.txt",
+      "publicPath": "static/frontend/frontend-bd4f7561b79d2d6be6e8.js.LICENSE.txt"
+    }
+  },
+  "chunks": {
+    "frontend": [
+      "frontend-bd4f7561b79d2d6be6e8.js"
+    ]
+  },
+  "publicPath": "static/frontend/"
+}
