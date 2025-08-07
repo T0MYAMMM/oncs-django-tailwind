@@ -212,6 +212,11 @@
                                 <a href="{% url 'common:scraper_configs_list' %}" class="text-base text-gray-900 rounded-lg flex items-center p-2 group hover:bg-gray-100 transition duration-75 pl-11 dark:text-gray-200 dark:hover:bg-gray-700 {% if 'scraper_configs' in segment %} bg-gray-100 dark:bg-gray-700 {% endif %}">Scraper Configs</a>
                             </li>
                             {% endif %}
+                            {% if sidebar_config.SHOW_CRUD_SEED_URLS %}
+                            <li>
+                                <a href="{% url 'common:seed_urls_list' %}" class="text-base text-gray-900 rounded-lg flex items-center p-2 group hover:bg-gray-100 transition duration-75 pl-11 dark:text-gray-200 dark:hover:bg-gray-700 {% if 'seed_urls' in segment %} bg-gray-100 dark:bg-gray-700 {% endif %}">Seed URLs</a>
+                            </li>
+                            {% endif %}
                         </ul>
                     </li>
                     {% endif %}
