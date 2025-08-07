@@ -600,6 +600,84 @@ def scraper_config_delete(request, pk):
     return redirect('common:scraper_configs_list')
 
 
+# Seed URL CRUD
+@login_required
+def seed_urls_list(request):
+    """List all seed URLs with search and pagination"""
+    search_query = request.GET.get('search', '')
+    seed_urls = NewsPortalSeedUrl.objects.select_related('portal').all()
+    
+    if search_query:
+        seed_urls = seed_urls.filter(
+            Q(url__icontains=search_query) |
+            Q(portal__name__icontains=search_query) |
+            Q(portal__domain__icontains=search_query)
+        )
+    
+    paginator = Paginator(seed_urls, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    # Get all portals for the forms
+    portals = NewsPortal.objects.all()
+    
+    context = {
+        'page_obj': page_obj,
+        'search_query': search_query,
+        'segment': 'seed_urls',
+        'parent': 'crud',
+        'portals': portals
+    }
+    return render(request, 'pages/CRUD/seed-urls.html', context)
+
+@login_required
+def seed_url_create(request):
+    """Create a new seed URL"""
+    if request.method == 'POST':
+        form = NewsPortalSeedUrlForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Seed URL created successfully!')
+            return redirect('common:seed_urls_list')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+            return redirect('common:seed_urls_list')
+    
+    # If it's a GET request, redirect to the list page
+    return redirect('common:seed_urls_list')
+
+@login_required
+def seed_url_edit(request, pk):
+    """Edit an existing seed URL"""
+    seed_url = get_object_or_404(NewsPortalSeedUrl, pk=pk)
+    
+    if request.method == 'POST':
+        form = NewsPortalSeedUrlForm(request.POST, instance=seed_url)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Seed URL updated successfully!')
+            return redirect('common:seed_urls_list')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+            return redirect('common:seed_urls_list')
+    
+    # If it's a GET request, redirect to the list page
+    return redirect('common:seed_urls_list')
+
+@login_required
+def seed_url_delete(request, pk):
+    """Delete a seed URL"""
+    seed_url = get_object_or_404(NewsPortalSeedUrl, pk=pk)
+    
+    if request.method == 'POST':
+        seed_url.delete()
+        messages.success(request, 'Seed URL deleted successfully!')
+        return redirect('common:seed_urls_list')
+    
+    # If it's a GET request, redirect to the list page
+    return redirect('common:seed_urls_list')
+
+
 # AJAX endpoints for dynamic forms
 @csrf_exempt
 @require_http_methods(["POST"])
