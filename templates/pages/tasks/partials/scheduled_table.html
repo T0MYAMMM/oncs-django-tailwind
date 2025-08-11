@@ -1,0 +1,50 @@
+<div class="overflow-x-auto">
+  <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+      <tr>
+        <th scope="col" class="px-6 py-3">Name</th>
+        <th scope="col" class="px-6 py-3">Config</th>
+        <th scope="col" class="px-6 py-3">Cron Expression</th>
+        <th scope="col" class="px-6 py-3">Status</th>
+        <th scope="col" class="px-6 py-3">Last Run</th>
+        <th scope="col" class="px-6 py-3">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for scheduled_task in scheduled_tasks %}
+      <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+        <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{{ scheduled_task.name }}</td>
+        <td class="px-6 py-4">{{ scheduled_task.crawler_config.name }}</td>
+        <td class="px-6 py-4">
+          <code class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">{{ scheduled_task.cron_expression }}</code>
+        </td>
+        <td class="px-6 py-4">
+          {% if scheduled_task.is_active %}
+            <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">Active</span>
+          {% else %}
+            <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300">Inactive</span>
+          {% endif %}
+        </td>
+        <td class="px-6 py-4">{{ scheduled_task.last_run|default:"Never"|date:"M d, Y H:i" }}</td>
+        <td class="px-6 py-4">
+          {% if scheduled_task.is_active %}
+            <form action="{% url 'tasks:execute-scheduled-crawler-task' scheduled_task.id %}" method="post" class="inline">
+              {% csrf_token %}
+              <button type="submit" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </button>
+            </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="6" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">No scheduled tasks found</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+

@@ -39,12 +39,19 @@ urlpatterns = [
     path('crawler-configs/create/', views.crawler_config_create, name='crawler_config_create'),
     path('crawler-configs/<int:pk>/edit/', views.crawler_config_edit, name='crawler_config_edit'),
     path('crawler-configs/<int:pk>/delete/', views.crawler_config_delete, name='crawler_config_delete'),
+    path('crawler-configs/<int:pk>/seed-urls/', views.crawler_config_seed_urls, name='crawler_config_seed_urls'),
     
     # Scraper Configs
     path('scraper-configs/', views.scraper_configs_list, name='scraper_configs_list'),
     path('scraper-configs/create/', views.scraper_config_create, name='scraper_config_create'),
     path('scraper-configs/<int:pk>/edit/', views.scraper_config_edit, name='scraper_config_edit'),
     path('scraper-configs/<int:pk>/delete/', views.scraper_config_delete, name='scraper_config_delete'),
+    
+    # Seed URLs
+    path('seed-urls/', views.seed_urls_list, name='seed_urls_list'),
+    path('seed-urls/create/', views.seed_url_create, name='seed_url_create'),
+    path('seed-urls/<int:pk>/edit/', views.seed_url_edit, name='seed_url_edit'),
+    path('seed-urls/<int:pk>/delete/', views.seed_url_delete, name='seed_url_delete'),
     
     # AJAX endpoints
     path('ajax/get-portal-selectors/', views.get_portal_selectors, name='get_portal_selectors'),

@@ -187,7 +187,7 @@
                         <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
                             {% if page_obj %}
                                 {% for config in page_obj %}
-                                <tr class="hover:bg-gray-100 dark:hover:bg-gray-700" data-config-id="{{ config.pk }}">
+                                <tr class="hover:bg-gray-100 dark:hover:bg-gray-700" data-config-id="{{ config.pk }}" data-portal-id="{{ config.portal_id }}" data-item-selector-id="{{ config.item_selector_id }}" data-custom-settings='{{ config.custom_settings|escapejs }}'>
                                     <td class="w-4 p-4">
                                         <div class="flex items-center">
                                             <input id="checkbox-{{ config.pk }}" aria-describedby="checkbox-1" type="checkbox"
@@ -211,6 +211,13 @@
                                         {{ config.updated_at }}</td>
 
                                     <td class="p-4 space-x-2 whitespace-nowrap">
+                                        <a href="{% url 'common:crawler_config_seed_urls' config.pk %}" 
+                                            class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                                            </svg>
+                                            Seed URLs
+                                        </a>
                                         <button type="button" 
                                             data-drawer-target="drawer-update-crawler-config-default"
                                             data-drawer-show="drawer-update-crawler-config-default"
@@ -408,6 +415,25 @@
                     </div>
                 </div>
 
+                <!-- Seed URLs for selected portal (Create) -->
+                <div>
+                    <label for="seed-url-search" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Seed URLs (by selected portal)</label>
+                    <input type="text" id="seed-url-search"
+                        class="mb-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                        placeholder="Filter seed URLs...">
+                    <div id="seed-url-list" class="max-h-56 overflow-y-auto border border-gray-200 rounded-lg p-2 dark:border-gray-700">
+                        {% for seed in seed_urls %}
+                        <label class="flex items-start space-x-2 py-1 px-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer seed-item" data-portal="{{ seed.portal_id }}">
+                            <input type="checkbox" class="mt-1 seed-checkbox" name="seed_urls" value="{{ seed.url }}">
+                            <span class="text-sm text-gray-700 dark:text-gray-300 break-all">{{ seed.url }}</span>
+                        </label>
+                        {% empty %}
+                        <div class="text-sm text-gray-500 dark:text-gray-400">No seed URLs found. Add some in Seed URLs page.</div>
+                        {% endfor %}
+                    </div>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Only URLs for the selected portal are shown.</p>
+                </div>
+
                 <div>
                     <label for="custom_settings" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Custom Settings</label>
                     <textarea name="custom_settings" id="custom_settings" rows="4"
@@ -502,6 +528,25 @@
                             {% endfor %}
                         </div>
                     </div>
+                </div>
+
+                <!-- Seed URLs for selected portal (Edit) -->
+                <div>
+                    <label for="edit-seed-url-search" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Seed URLs (by selected portal)</label>
+                    <input type="text" id="edit-seed-url-search"
+                        class="mb-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                        placeholder="Filter seed URLs...">
+                    <div id="edit-seed-url-list" class="max-h-56 overflow-y-auto border border-gray-200 rounded-lg p-2 dark:border-gray-700">
+                        {% for seed in seed_urls %}
+                        <label class="flex items-start space-x-2 py-1 px-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer edit-seed-item" data-portal="{{ seed.portal_id }}">
+                            <input type="checkbox" class="mt-1 edit-seed-checkbox" name="seed_urls" value="{{ seed.url }}">
+                            <span class="text-sm text-gray-700 dark:text-gray-300 break-all">{{ seed.url }}</span>
+                        </label>
+                        {% empty %}
+                        <div class="text-sm text-gray-500 dark:text-gray-400">No seed URLs found. Add some in Seed URLs page.</div>
+                        {% endfor %}
+                    </div>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Only URLs for the selected portal are shown.</p>
                 </div>
 
                 <div>

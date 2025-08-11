@@ -1,0 +1,202 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %} Job Details - {{ task.crawler_config.name }} {% endblock title %}
+
+{% block content %}
+
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Job Details</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'tasks:tasks' %}">Tasks</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Job Details</li>
+            </ol>
+        </nav>
+    </div>
+
+    <!-- Job Information -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Task Information</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Task ID:</strong></td>
+                                    <td>{{ task.id }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Crawler Config:</strong></td>
+                                    <td>{{ task.crawler_config.name }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Portal:</strong></td>
+                                    <td>{{ task.crawler_config.portal.name }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Status:</strong></td>
+                                    <td>
+                                        <span class="badge badge-{% if task.status == 'completed' %}success{% elif task.status == 'running' %}warning{% elif task.status == 'failed' %}danger{% else %}secondary{% endif %}">
+                                            {{ task.status|title }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Scrapyd Job ID:</strong></td>
+                                    <td>{{ task.scrapyd_job_id|default:"Not available" }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Started At:</strong></td>
+                                    <td>{{ task.started_at|default:"Not started" }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Completed At:</strong></td>
+                                    <td>{{ task.completed_at|default:"Not completed" }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Execution Time:</strong></td>
+                                    <td>{{ task.execution_time|default:"Not available" }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Job Details from Scrapyd -->
+    {% if job_details.error %}
+    <div class="row">
+        <div class="col-12">
+            <div class="alert alert-danger">
+                <strong>Error:</strong> {{ job_details.error }}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="row">
+        <!-- Job Status -->
+        <div class="col-md-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Job Status</h6>
+                </div>
+                <div class="card-body">
+                    <p><strong>Status:</strong> 
+                        <span class="badge badge-{% if job_details.status == 'finished' %}success{% elif job_details.status == 'running' %}warning{% elif job_details.status == 'pending' %}info{% else %}secondary{% endif %}">
+                            {{ job_details.status|title }}
+                        </span>
+                    </p>
+                    {% if job_details.job_info %}
+                    <p><strong>Start Time:</strong> {{ job_details.job_info.start_time|default:"Not available" }}</p>
+                    <p><strong>End Time:</strong> {{ job_details.job_info.end_time|default:"Not available" }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="col-md-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Actions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="btn-group" role="group">
+                        <a href="{% url 'tasks:scrapyd-fetch-logs' task.id %}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-download"></i> Fetch Logs
+                        </a>
+                        <a href="{% url 'tasks:scrapyd-fetch-items' task.id %}" class="btn btn-success btn-sm">
+                            <i class="fas fa-download"></i> Fetch Items
+                        </a>
+                        {% if job_details.status == 'running' %}
+                        <a href="{% url 'tasks:scrapyd-cancel-job' task.id %}" class="btn btn-danger btn-sm" 
+                           onclick="return confirm('Are you sure you want to cancel this job?')">
+                            <i class="fas fa-stop"></i> Cancel Job
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logs and Items -->
+    <div class="row">
+        <!-- Logs -->
+        <div class="col-md-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Logs</h6>
+                </div>
+                <div class="card-body">
+                    {% if job_details.log_content %}
+                    <div class="bg-dark text-light p-3 rounded" style="max-height: 400px; overflow-y: auto;">
+                        <pre class="mb-0"><code>{{ job_details.log_content }}</code></pre>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No logs available</p>
+                    {% endif %}
+                    {% if job_details.log_url %}
+                    <div class="mt-2">
+                        <a href="{{ job_details.log_url }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-external-link-alt"></i> View on Scrapyd
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Items -->
+        <div class="col-md-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Items</h6>
+                </div>
+                <div class="card-body">
+                    {% if job_details.items_content %}
+                    <div class="bg-light p-3 rounded" style="max-height: 400px; overflow-y: auto;">
+                        <pre class="mb-0"><code>{{ job_details.items_content }}</code></pre>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No items available</p>
+                    {% endif %}
+                    {% if job_details.items_url %}
+                    <div class="mt-2">
+                        <a href="{{ job_details.items_url }}" target="_blank" class="btn btn-outline-success btn-sm">
+                            <i class="fas fa-external-link-alt"></i> View on Scrapyd
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock content %}
+
+{% block javascripts %}
+<script>
+// Auto-refresh job status every 30 seconds if job is running
+{% if job_details.status == 'running' %}
+setInterval(function() {
+    location.reload();
+}, 30000);
+{% endif %}
+</script>
+{% endblock javascripts %}

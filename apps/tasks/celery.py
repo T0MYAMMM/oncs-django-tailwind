@@ -20,6 +20,9 @@ if os.environ.get('DJANGO_SETTINGS_MODULE'):
     # Load task modules from all registered Django apps.
     app.autodiscover_tasks()
 
+    # Export the app as 'celery' for the Celery command
+    celery = app
+
 else:
     print(' ')
     print('Celery Configuration ERROR: ') 

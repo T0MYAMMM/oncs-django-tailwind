@@ -1,0 +1,37 @@
+<div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+  <div class="flex items-center justify-between mb-4">
+    <div class="flex-shrink-0">
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Create Single Task</h3>
+      <p class="text-sm text-gray-500 dark:text-gray-400">Execute a one-time crawler task</p>
+    </div>
+    <div class="flex-shrink-0">
+      <svg class="w-8 h-8 text-primary-600 dark:text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+      </svg>
+    </div>
+  </div>
+
+  <form action="{% url 'tasks:create-crawler-task' %}" method="post" class="space-y-4">
+    {% csrf_token %}
+    <div>
+      <label for="crawler_config" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Crawler Config</label>
+      <select name="crawler_config" id="crawler_config" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+        <option value="">Select crawler config</option>
+        {% for config in crawler_configs %}
+          {% if config.custom_settings and config.custom_settings.seed_urls %}
+            <option value="{{ config.pk }}">{{ config.name }} ({{ config.portal.name }}) - {{ config.custom_settings.seed_urls|length }} seed URLs</option>
+          {% else %}
+            <option value="{{ config.pk }}">{{ config.name }} ({{ config.portal.name }}) - 0 seed URLs</option>
+          {% endif %}
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+      <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      </svg>
+      Create & Execute Task
+    </button>
+  </form>
+</div>
+

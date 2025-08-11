@@ -165,6 +165,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             const formData = new FormData(this);
+
+            // Collect selected seed URLs
+            const seedCheckboxes = document.querySelectorAll('#seed-url-list .seed-checkbox:checked');
+            const selectedSeeds = Array.from(seedCheckboxes).map(cb => cb.value);
+            if (selectedSeeds.length > 0) {
+                // Append as multiple values
+                selectedSeeds.forEach(url => formData.append('seed_urls', url));
+            }
             
             fetch(this.action, {
                 method: 'POST',
@@ -550,18 +558,29 @@ document.addEventListener('DOMContentLoaded', function() {
             const portalField = document.getElementById('edit_portal');
             const itemSelectorField = document.getElementById('edit_item_selector');
             const customSettingsField = document.getElementById('edit_custom_settings');
+            const editSeedList = document.getElementById('edit-seed-url-list');
+            const row = document.querySelector(`tr[data-config-id="${configData.id}"]`);
             
             if (nameField) nameField.value = configData.name || '';
-            if (portalField) portalField.value = configData.portal || '';
-            if (itemSelectorField) itemSelectorField.value = configData.item_selector || '';
+            if (portalField) portalField.value = row?.dataset.portalId || '';
+            if (itemSelectorField) itemSelectorField.value = row?.dataset.itemSelectorId || '';
             if (customSettingsField) {
-                // Show default value if custom_settings is empty or just whitespace
-                const customSettings = configData.custom_settings?.trim() || '';
-                if (customSettings === '' || customSettings === '{}' || customSettings === 'null') {
-                    customSettingsField.value = '{"delay": 1}';
-                } else {
-                    customSettingsField.value = customSettings;
+                let cs = row?.dataset.customSettings || '';
+                if (!cs || cs === '{}' || cs === 'null') cs = '{"delay": 1}';
+                customSettingsField.value = cs;
+            }
+
+            // Preselect seed URLs from custom_settings if present
+            try {
+                const csObj = JSON.parse(row?.dataset.customSettings || '{}');
+                const currentSeeds = Array.isArray(csObj.seed_urls) ? csObj.seed_urls : [];
+                if (editSeedList) {
+                    editSeedList.querySelectorAll('.edit-seed-checkbox').forEach(cb => {
+                        cb.checked = currentSeeds.includes(cb.value);
+                    });
                 }
+            } catch (e) {
+                // ignore
             }
         }
     }
@@ -598,6 +617,35 @@ document.addEventListener('DOMContentLoaded', function() {
             populateEditForm(configData);
         });
     });
+
+    // Filter seed list by selected portal (Create)
+    const portalHidden = document.getElementById('portal');
+    const seedList = document.getElementById('seed-url-list');
+    const seedSearch = document.getElementById('seed-url-search');
+    function refreshSeedVisibility(listEl, portalId, searchValue, itemSelector) {
+        const term = (searchValue || '').toLowerCase();
+        listEl.querySelectorAll(itemSelector).forEach(label => {
+            const belongs = !portalId || label.dataset.portal === portalId;
+            const text = label.textContent.toLowerCase();
+            const matches = text.includes(term);
+            label.style.display = belongs && matches ? 'flex' : 'none';
+        });
+    }
+    if (portalHidden && seedList) {
+        portalHidden.addEventListener('change', () => refreshSeedVisibility(seedList, portalHidden.value, seedSearch?.value, '.seed-item'));
+        if (seedSearch) seedSearch.addEventListener('input', () => refreshSeedVisibility(seedList, portalHidden.value, seedSearch.value, '.seed-item'));
+        refreshSeedVisibility(seedList, portalHidden.value, seedSearch?.value, '.seed-item');
+    }
+
+    // Filter seed list by selected portal (Edit)
+    const editPortalHidden = document.getElementById('edit_portal');
+    const editSeedList = document.getElementById('edit-seed-url-list');
+    const editSeedSearch = document.getElementById('edit-seed-url-search');
+    if (editPortalHidden && editSeedList) {
+        editPortalHidden.addEventListener('change', () => refreshSeedVisibility(editSeedList, editPortalHidden.value, editSeedSearch?.value, '.edit-seed-item'));
+        if (editSeedSearch) editSeedSearch.addEventListener('input', () => refreshSeedVisibility(editSeedList, editPortalHidden.value, editSeedSearch.value, '.edit-seed-item'));
+        refreshSeedVisibility(editSeedList, editPortalHidden.value, editSeedSearch?.value, '.edit-seed-item');
+    }
     
     // Add click handlers for delete buttons
     document.querySelectorAll('[data-drawer-target="drawer-delete-crawler-config-default"]').forEach(button => {

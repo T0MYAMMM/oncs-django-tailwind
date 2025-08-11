@@ -14,7 +14,9 @@ from django.conf import settings
 from celery.exceptions import Ignore, TaskError
 
 # Import crawler models
-from apps.common.models import CrawlerConfig, CrawlerTask, CrawlerScheduledTask
+from apps.common.models import CrawlerConfig, CrawlerTask, CrawlerScheduledTask, ItemSelector, ItemChoices, SelectorMethodChoices
+from apps.tasks.models import ScrapydServer
+from apps.tasks.scrapyd_api import get_scrapyd_api, fetch_and_save_logs, fetch_and_save_items, get_job_details
 from django.utils import timezone
 
 
@@ -47,6 +49,9 @@ def write_to_log_file(logs, script_name):
     current_time = datetime.datetime.now().strftime("%y%m%d-%H%M%S")
     log_file_name = f"{script_base_name}-{current_time}.log"
     log_file_path = os.path.join(settings.CELERY_LOGS_DIR, log_file_name)
+    
+    # Create the directory if it doesn't exist
+    os.makedirs(settings.CELERY_LOGS_DIR, exist_ok=True)
     
     with open(log_file_path, 'w') as log_file:
         log_file.write(logs)
@@ -91,6 +96,105 @@ def execute_script(self, data: dict):
         return {"logs": logs, "input": script, "error": error, "output": "", "status": status, "log_file": log_file}
 
 
+def _build_generic_spider_payload(crawler_config: CrawlerConfig, worker_id: str = 'celery-worker-001') -> dict:
+    """Build payload for generic multipurpose spider based on CrawlerConfig."""
+    portal = crawler_config.portal
+    custom_settings = crawler_config.custom_settings or {}
+
+    # Determine start URLs: from custom_settings.seed_urls if present, else portal seed_urls
+    start_urls = []
+    if isinstance(custom_settings.get('seed_urls'), list):
+        start_urls = custom_settings.get('seed_urls')
+    else:
+        start_urls = [s.url for s in portal.seed_urls.all()]
+
+    # Map selector queryset for URL_LIST to config schema
+    selectors_config = { 'url_list': [] }
+    url_list_selectors = ItemSelector.objects.filter(portal=portal, item=ItemChoices.URL_LIST)
+    for sel in url_list_selectors:
+        selectors_config['url_list'].append({
+            'method': sel.method,
+            'query' : sel.query,
+        })
+
+    headers = custom_settings.get('headers') or {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36'
+    }
+
+    proxy_settings = custom_settings.get('proxy_settings') or {
+        'enable': False,
+        'auto_rotate': False,
+        'specific_proxy_type': 'local'
+    }
+
+    # Ensure allowed_domains is a list
+    allowed_domains = [portal.domain] if portal.domain else []
+
+    config_dict = {
+        'name': f'{portal.name.lower()}_spider',
+        'portal_name': portal.name,
+        'portal_domain': portal.domain,
+        'start_urls': start_urls[0] if len(start_urls) == 1 else start_urls,
+        'allowed_domains': allowed_domains,
+        'selectors': selectors_config,
+        'headers': headers,
+        'proxy_settings': proxy_settings,
+        'custom_settings': custom_settings.get('SCRAPY_SETTINGS_JSON') or json.dumps(custom_settings or {})
+    }
+
+    # Scrapyd expects these specific fields
+    payload = {
+        'project': 'scrapy_crawler',
+        'spider': 'generic',
+        'config_dict': json.dumps(config_dict),
+    }
+
+    return payload
+
+
+def _post_to_scrapyd(server: ScrapydServer, payload: dict) -> dict:
+    """Send payload to Scrapyd server with proper error handling."""
+    url = f"{server.base_url}/schedule.json"
+    
+    print(f"DEBUG: Sending request to Scrapyd at {url}")
+    print(f"DEBUG: Payload: {json.dumps(payload, indent=2)}")
+    
+    try:
+        # First, let's test if the Scrapyd server is reachable
+        test_url = f"{server.base_url}/listprojects.json"
+        print(f"DEBUG: Testing Scrapyd connectivity at {test_url}")
+        test_response = requests.get(test_url, timeout=5)
+        print(f"DEBUG: Scrapyd connectivity test status: {test_response.status_code}")
+        
+        if test_response.status_code != 200:
+            raise RuntimeError(f"Scrapyd server not accessible. Status: {test_response.status_code}")
+        
+        # Now send the actual request
+        response = requests.post(url, data=payload, timeout=15)
+        print(f"DEBUG: Scrapyd response status: {response.status_code}")
+        print(f"DEBUG: Scrapyd response content: {response.text}")
+        
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.ConnectionError as e:
+        error_msg = f"Connection error to Scrapyd server {server.base_url}: {str(e)}"
+        print(f"ERROR: {error_msg}")
+        raise RuntimeError(error_msg)
+    except requests.exceptions.Timeout as e:
+        error_msg = f"Timeout error to Scrapyd server {server.base_url}: {str(e)}"
+        print(f"ERROR: {error_msg}")
+        raise RuntimeError(error_msg)
+    except requests.exceptions.HTTPError as e:
+        error_msg = f"HTTP error from Scrapyd server {server.base_url}: {str(e)}"
+        print(f"ERROR: {error_msg}")
+        print(f"ERROR: Response content: {response.text if 'response' in locals() else 'No response'}")
+        raise RuntimeError(error_msg)
+    except Exception as e:
+        error_msg = f"Unexpected error communicating with Scrapyd server {server.base_url}: {str(e)}"
+        print(f"ERROR: {error_msg}")
+        raise RuntimeError(error_msg)
+
+
 @app.task(bind=True, base=AbortableTask)
 def execute_crawler_task(self, crawler_task_id: int):
     """
@@ -99,9 +203,13 @@ def execute_crawler_task(self, crawler_task_id: int):
     :rtype: dict
     """
     try:
+        print(f"DEBUG: Starting execute_crawler_task for task_id: {crawler_task_id}")
+        
         # Get the crawler task
         crawler_task = CrawlerTask.objects.get(id=crawler_task_id)
         crawler_config = crawler_task.crawler_config
+        
+        print(f"DEBUG: Found crawler_task: {crawler_task.id}, config: {crawler_config.name}")
         
         # Update task status to running
         crawler_task.status = 'running'
@@ -110,45 +218,69 @@ def execute_crawler_task(self, crawler_task_id: int):
         
         print(f"DEBUG: Executing crawler task {crawler_task.id} for config: {crawler_config.name}")
         
-        # Prepare ScrapyD request data
-        scrapyd_data = {
-            'project': 'news_crawler',
-            'spider': f"{crawler_config.portal.name.lower()}_spider",
-            'settings': json.dumps(crawler_config.custom_settings or {}),
-            'jobid': f"crawler_task_{crawler_task.id}_{int(time.time())}"
-        }
+        # Build payload for generic spider
+        payload = _build_generic_spider_payload(crawler_config)
+        print(f"DEBUG: Built payload: {json.dumps(payload, indent=2)}")
+
+        # Get Scrapyd API
+        api = get_scrapyd_api()
+        print(f"DEBUG: Using Scrapyd server: {api.base_url}")
+
+        # Send to Scrapyd using the new API
+        response_json = api.schedule(**payload)
+        print(f"DEBUG: Scrapyd response: {json.dumps(response_json, indent=2)}")
         
-        # For now, just simulate the ScrapyD request (console log)
-        print(f"DEBUG: Would send POST request to ScrapyD schedule.json with:")
-        print(f"  - Project: {scrapyd_data['project']}")
-        print(f"  - Spider: {scrapyd_data['spider']}")
-        print(f"  - Settings: {scrapyd_data['settings']}")
-        print(f"  - Job ID: {scrapyd_data['jobid']}")
-        
-        # Simulate processing time
-        time.sleep(2)
-        
-        # Update task status to completed
+        jobid = response_json.get('jobid') or response_json.get('jobid'.upper()) or f"crawler_task_{crawler_task.id}_{int(time.time())}"
+        print(f"DEBUG: Extracted jobid: {jobid}")
+
+        # Update task status to completed (queued in Scrapyd)
         crawler_task.status = 'completed'
         crawler_task.completed_at = timezone.now()
         crawler_task.execution_time = crawler_task.completed_at - crawler_task.started_at
-        crawler_task.scrapyd_job_id = scrapyd_data['jobid']
+        crawler_task.scrapyd_job_id = jobid
         crawler_task.save()
+
+        # Fetch and save logs and items
+        log_file = None
+        items_file = None
         
-        logs = f"Crawler task {crawler_task.id} completed successfully\n"
-        logs += f"Config: {crawler_config.name}\n"
-        logs += f"Portal: {crawler_config.portal.name}\n"
-        logs += f"Execution time: {crawler_task.execution_time}\n"
+        try:
+            log_file = fetch_and_save_logs(crawler_task.id)
+            print(f"DEBUG: Log file saved: {log_file}")
+        except Exception as log_error:
+            print(f"WARNING: Could not fetch logs: {log_error}")
         
-        log_file = write_to_log_file(logs, f"crawler_task_{crawler_task.id}")
-        
+        try:
+            items_file = fetch_and_save_items(crawler_task.id)
+            print(f"DEBUG: Items file saved: {items_file}")
+        except Exception as items_error:
+            print(f"WARNING: Could not fetch items: {items_error}")
+
+        logs = (
+            f"Dispatched crawler task {crawler_task.id} to Scrapyd\n"
+            f"Server: {api.base_url}\n"
+            f"Job ID: {jobid}\n"
+            f"Payload: {json.dumps(payload)}\n"
+            f"Log file: {log_file or 'Not available'}\n"
+            f"Items file: {items_file or 'Not available'}\n"
+        )
+
+        # Try to write log file, but don't fail the task if it doesn't work
+        try:
+            local_log_file = write_to_log_file(logs, f"crawler_task_{crawler_task.id}")
+        except Exception as log_error:
+            print(f"WARNING: Could not write log file: {log_error}")
+            local_log_file = ""
+
         return {
             "logs": logs,
             "input": f"crawler_task_{crawler_task.id}",
             "error": False,
-            "output": f"Task completed successfully. Job ID: {scrapyd_data['jobid']}",
+            "output": f"Queued in Scrapyd. Job ID: {jobid}",
             "status": "SUCCESS",
-            "log_file": log_file
+            "log_file": local_log_file,
+            "scrapyd_log_file": log_file,
+            "scrapyd_items_file": items_file
         }
         
     except CrawlerTask.DoesNotExist:
@@ -165,6 +297,8 @@ def execute_crawler_task(self, crawler_task_id: int):
     except Exception as e:
         error_msg = f"Error executing crawler task {crawler_task_id}: {str(e)}"
         print(f"ERROR: {error_msg}")
+        import traceback
+        print(f"ERROR: Traceback: {traceback.format_exc()}")
         
         # Update task status to failed
         try:

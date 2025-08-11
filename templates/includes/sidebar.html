@@ -167,6 +167,32 @@
                     </li>
                     {% endif %}
 
+                    {% if sidebar_config.SHOW_TASKS %}
+                    <li>
+                        <button type="button" class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700 {% if 'tasks' in parent %} bg-gray-100 dark:bg-gray-700 {% endif %}" aria-controls="dropdown-tasks" data-collapse-toggle="dropdown-tasks">
+                            <svg class="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3 1.5 1.5 3-3.75" />
+                            </svg>
+                            
+                            <span class="flex-1 ml-3 text-left whitespace-nowrap" sidebar-toggle-item>TASK</span>
+                            <svg sidebar-toggle-item class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                        </button>
+                        <ul id="dropdown-tasks" class="space-y-2 py-2 {% if 'tasks' in parent %}block {% else %} hidden{% endif %}">
+                            {% if sidebar_config.SHOW_TASKS_SUMMARY %}
+                            <li>
+                                <a href="{% url "tasks:summary" %}" class="text-base text-gray-900 rounded-lg flex items-center p-2 group hover:bg-gray-100 transition duration-75 pl-11 dark:text-gray-200 dark:hover:bg-gray-700 {% if 'summary' in segment %} bg-gray-100 dark:bg-gray-700 {% endif %}">Summary</a>
+                            </li>
+                            {% endif %}
+
+                            {% if sidebar_config.SHOW_TASKS_CRAWLER %}
+                            <li>
+                                <a href="{% url "tasks:crawler" %}" class="text-base text-gray-900 rounded-lg flex items-center p-2 group hover:bg-gray-100 transition duration-75 pl-11 dark:text-gray-200 dark:hover:bg-gray-700 {% if 'crawler' in segment %} bg-gray-100 dark:bg-gray-700 {% endif %}">Crawler</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                    {% endif %}
+
                     {% if sidebar_config.SHOW_CRUD %}
                     <li>
                         <button type="button" class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700 {% if 'crud' in parent %} bg-gray-100 dark:bg-gray-700 {% endif %}" aria-controls="dropdown-crud" data-collapse-toggle="dropdown-crud">
@@ -210,6 +236,11 @@
                             {% if sidebar_config.SHOW_CRUD_SCRAPER_CONFIGS %}
                             <li>
                                 <a href="{% url 'common:scraper_configs_list' %}" class="text-base text-gray-900 rounded-lg flex items-center p-2 group hover:bg-gray-100 transition duration-75 pl-11 dark:text-gray-200 dark:hover:bg-gray-700 {% if 'scraper_configs' in segment %} bg-gray-100 dark:bg-gray-700 {% endif %}">Scraper Configs</a>
+                            </li>
+                            {% endif %}
+                            {% if sidebar_config.SHOW_CRUD_SEED_URLS %}
+                            <li>
+                                <a href="{% url 'common:seed_urls_list' %}" class="text-base text-gray-900 rounded-lg flex items-center p-2 group hover:bg-gray-100 transition duration-75 pl-11 dark:text-gray-200 dark:hover:bg-gray-700 {% if 'seed_urls' in segment %} bg-gray-100 dark:bg-gray-700 {% endif %}">Seed URLs</a>
                             </li>
                             {% endif %}
                         </ul>

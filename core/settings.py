@@ -128,8 +128,8 @@ WSGI_APPLICATION = "core.wsgi.application"
 
 
 # Sidebar configuration
-SIDEBAR_CONFIG = {
-    'SHOW_APPS': True,
+SHOW_APP_CONFIG = {
+    'SHOW_APPS': False,
     'SHOW_LAYOUTS': False,
     'SHOW_CRUD': True,
     'SHOW_PAGES': False,
@@ -147,23 +147,35 @@ SIDEBAR_CONFIG = {
     'SHOW_APPS_REACT_CHARTS': True,
     'SHOW_APPS_FILE_MANAGER': True,
     'SHOW_APPS_API': True,
-    'SHOW_APPS_TASKS': True,
+    'SHOW_APPS_TASKS': False,
 
     'SHOW_LAYOUTS_STACKED': False,
     'SHOW_LAYOUTS_SIDEBAR': False,
 
-    'SHOW_CRUD_PRODUCTS': True,
-    'SHOW_CRUD_USERS': True,
+    # Tasks section (sidebar)
+    'SHOW_TASKS': True,
+    'SHOW_TASKS_SUMMARY': True,
+    'SHOW_TASKS_CRAWLER': True,
+
+    'SHOW_CRUD_PRODUCTS': False,
+    'SHOW_CRUD_USERS': False,
     'SHOW_CRUD_NEWS_PORTALS': True,
+    'SHOW_CRUD_NEWS_ARTICLE_RAW_URLS': True,
+    'SHOW_CRUD_NEWS_ARTICLE_CLEAN_URLS': True,
     'SHOW_CRUD_NEWS_ARTICLES': True,
     'SHOW_CRUD_SELECTORS': True,
     'SHOW_CRUD_CRAWLER_CONFIGS': True,
     'SHOW_CRUD_SCRAPER_CONFIGS': True,
+    'SHOW_CRUD_SEED_URLS': True,
 
     'SHOW_PLAYGROUND_STACKED': False,
     'SHOW_PLAYGROUND_SIDEBAR': False,
 
-
+    'SHOW_PAGES_PRICING': False,
+    'SHOW_PAGES_MAINTENANCE': False,
+    'SHOW_PAGES_ERROR_404': False,
+    'SHOW_PAGES_ERROR_500': False,
+    'SHOW_PAGES_SETTINGS': False,
 }
 
 # Database
@@ -287,8 +299,8 @@ CELERY_SCRIPTS_DIR        = os.path.join(BASE_DIR, "tasks_scripts" )
 CELERY_LOGS_URL           = "/tasks_logs/"
 CELERY_LOGS_DIR           = os.path.join(BASE_DIR, "tasks_logs"    )
 
-CELERY_BROKER_URL         = os.environ.get("CELERY_BROKER", "redis://redis:6379")
-CELERY_RESULT_BACKEND     = os.environ.get("CELERY_BROKER", "redis://redis:6379")
+CELERY_BROKER_URL         = os.environ.get("CELERY_BROKER", "redis://localhost:6379")
+CELERY_RESULT_BACKEND     = os.environ.get("CELERY_BROKER", "redis://localhost:6379")
 
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT    = 30 * 60

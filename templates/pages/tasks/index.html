@@ -1,0 +1,20 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block content %}
+<main>
+  <div class="px-4 pt-6 2xl:px-0">
+    <div class="grid gap-4 xl:grid-cols-2 2xl:grid-cols-3">
+
+      {% include "pages/tasks/partials/create_one_off.html" %}
+      {% include "pages/tasks/partials/create_scheduled.html" %}
+      {% include "pages/tasks/partials/summary_cards.html" %}
+
+      {% include "pages/tasks/partials/recent_tasks.html" %}
+      {% include "pages/tasks/partials/scheduled_table.html" %}
+
+    </div>
+  </div>
+</main>
+{% endblock content %}
+

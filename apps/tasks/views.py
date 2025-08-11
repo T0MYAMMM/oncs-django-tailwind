@@ -2,8 +2,8 @@ import os
 import time
 import json
 
-from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import render, redirect, get_object_or_404
 
 from celery import current_app
 from apps.tasks.tasks import execute_script, get_scripts, execute_crawler_task, execute_scheduled_crawler_task
@@ -18,7 +18,10 @@ from django.conf import settings
 from django.template  import loader
 
 # Import crawler models
-from apps.common.models import CrawlerConfig, CrawlerTask, CrawlerScheduledTask
+from apps.common.models import CrawlerConfig, CrawlerTask, CrawlerScheduledTask, NewsPortalSeedUrl
+
+# Import Scrapyd API
+from apps.tasks.scrapyd_api import get_scrapyd_api, fetch_and_save_logs, fetch_and_save_items, get_job_details, ScrapydAPIError
 
 # Create your views here.
 
@@ -28,7 +31,7 @@ def index(request):
 
 
 # @login_required(login_url="/login/")
-def tasks(request):
+def summary(request):
 
     scripts, ErrInfo = get_scripts()
  
@@ -37,7 +40,7 @@ def tasks(request):
             'tasks'    : get_celery_all_tasks(),
             'scripts'  : scripts,
             'segment'  : 'tasks',
-            'parent'   : 'apps',
+            'parent'   : 'tasks',
         }
 
     # django_celery_results_task_result
@@ -49,12 +52,36 @@ def tasks(request):
     scheduled_tasks = CrawlerScheduledTask.objects.select_related('crawler_config', 'crawler_config__portal').all().order_by('-created_at')[:10]
     crawler_configs = CrawlerConfig.objects.select_related('portal').all()
     
+    # Add seed URLs data
+    seed_urls = NewsPortalSeedUrl.objects.select_related('portal').all()
+    
     context["crawler_tasks"] = crawler_tasks
     context["scheduled_tasks"] = scheduled_tasks
     context["crawler_configs"] = crawler_configs
+    context["seed_urls"] = seed_urls
 
-    html_template = loader.get_template('apps/tasks.html')
-    return HttpResponse(html_template.render(context, request)) 
+    return render(request, 'pages/tasks/summary.html', context)
+
+
+def crawler(request):
+    scripts, ErrInfo = get_scripts()
+    crawler_tasks = CrawlerTask.objects.select_related('crawler_config', 'crawler_config__portal').all().order_by('-created_at')[:10]
+    scheduled_tasks = CrawlerScheduledTask.objects.select_related('crawler_config', 'crawler_config__portal').all().order_by('-created_at')[:10]
+    crawler_configs = CrawlerConfig.objects.select_related('portal').all()
+    seed_urls = NewsPortalSeedUrl.objects.select_related('portal').all()
+
+    context = {
+        'cfgError': ErrInfo,
+        'scripts': scripts,
+        'crawler_tasks': crawler_tasks,
+        'scheduled_tasks': scheduled_tasks,
+        'crawler_configs': crawler_configs,
+        'seed_urls': seed_urls,
+        'segment': 'crawler',
+        'parent': 'tasks',
+    }
+
+    return render(request, 'pages/tasks/crawler.html', context)
 
 def run_task(request, task_name):
     '''
@@ -284,3 +311,165 @@ def execute_scheduled_crawler_task_view(request, scheduled_task_id):
             print(f"Error executing scheduled crawler task: {str(e)}")
     
     return redirect('tasks:tasks')
+
+
+# Scrapyd API Views
+def scrapyd_job_details(request, task_id):
+    """
+    Get comprehensive job details including status, logs, and items
+    """
+    try:
+        crawler_task = get_object_or_404(CrawlerTask, id=task_id)
+        job_details = get_job_details(task_id)
+        
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse(job_details)
+        
+        context = {
+            'task': crawler_task,
+            'job_details': job_details,
+            'segment': 'tasks',
+            'parent': 'tasks',
+        }
+        return render(request, 'pages/tasks/job_details.html', context)
+        
+    except Exception as e:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'error': str(e)}, status=500)
+        return HttpResponse(f"Error: {str(e)}", status=500)
+
+
+def scrapyd_fetch_logs(request, task_id):
+    """
+    Fetch and save logs from Scrapyd
+    """
+    try:
+        crawler_task = get_object_or_404(CrawlerTask, id=task_id)
+        
+        if not crawler_task.scrapyd_job_id:
+            return JsonResponse({'error': 'No Scrapyd job ID found'}, status=400)
+        
+        log_file = fetch_and_save_logs(task_id)
+        
+        if log_file:
+            return JsonResponse({
+                'success': True,
+                'message': 'Logs fetched and saved successfully',
+                'log_file': log_file
+            })
+        else:
+            return JsonResponse({'error': 'Failed to fetch logs'}, status=500)
+            
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+def scrapyd_fetch_items(request, task_id):
+    """
+    Fetch and save items from Scrapyd
+    """
+    try:
+        crawler_task = get_object_or_404(CrawlerTask, id=task_id)
+        
+        if not crawler_task.scrapyd_job_id:
+            return JsonResponse({'error': 'No Scrapyd job ID found'}, status=400)
+        
+        items_file = fetch_and_save_items(task_id)
+        
+        if items_file:
+            return JsonResponse({
+                'success': True,
+                'message': 'Items fetched and saved successfully',
+                'items_file': items_file
+            })
+        else:
+            return JsonResponse({'error': 'Failed to fetch items'}, status=500)
+            
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+def scrapyd_cancel_job(request, task_id):
+    """
+    Cancel a running Scrapyd job
+    """
+    try:
+        crawler_task = get_object_or_404(CrawlerTask, id=task_id)
+        
+        if not crawler_task.scrapyd_job_id:
+            return JsonResponse({'error': 'No Scrapyd job ID found'}, status=400)
+        
+        api = get_scrapyd_api()
+        result = api.cancel('scrapy_crawler', crawler_task.scrapyd_job_id)
+        
+        # Update task status
+        crawler_task.status = 'cancelled'
+        crawler_task.completed_at = timezone.now()
+        crawler_task.save()
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Job cancelled successfully',
+            'result': result
+        })
+        
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+def scrapyd_list_jobs(request):
+    """
+    List all jobs from Scrapyd
+    """
+    try:
+        api = get_scrapyd_api()
+        jobs = api.listjobs('scrapy_crawler')
+        
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse(jobs)
+        
+        context = {
+            'jobs': jobs,
+            'segment': 'tasks',
+            'parent': 'tasks',
+        }
+        return render(request, 'pages/tasks/scrapyd_jobs.html', context)
+        
+    except Exception as e:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'error': str(e)}, status=500)
+        return HttpResponse(f"Error: {str(e)}", status=500)
+
+
+def scrapyd_server_status(request):
+    """
+    Get Scrapyd server status and information
+    """
+    try:
+        api = get_scrapyd_api()
+        
+        # Get various server information
+        projects = api.listprojects()
+        jobs = api.listjobs('scrapy_crawler') if 'scrapy_crawler' in projects.get('projects', []) else {}
+        
+        server_info = {
+            'server_url': api.base_url,
+            'projects': projects,
+            'jobs': jobs,
+            'total_jobs': sum(len(jobs.get(status, [])) for status in ['pending', 'running', 'finished'])
+        }
+        
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse(server_info)
+        
+        context = {
+            'server_info': server_info,
+            'segment': 'tasks',
+            'parent': 'tasks',
+        }
+        return render(request, 'pages/tasks/scrapyd_status.html', context)
+        
+    except Exception as e:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'error': str(e)}, status=500)
+        return HttpResponse(f"Error: {str(e)}", status=500)

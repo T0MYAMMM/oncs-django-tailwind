@@ -1,0 +1,188 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Tasks Summary{% endblock title %}
+
+{% block content %}
+<div class="p-4 pt-6 2xl:px-0">
+  <!-- Page Header -->
+  <div class="mb-4">
+    <h1 class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">Tasks Summary</h1>
+    <nav class="flex mt-2" aria-label="Breadcrumb">
+      <ol class="inline-flex items-center space-x-1 md:space-x-3">
+        <li class="inline-flex items-center">
+          <a href="{% url 'tasks:tasks' %}" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">
+            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
+            </svg>
+            Tasks
+          </a>
+        </li>
+        <li>
+          <div class="flex items-center">
+            <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2 dark:text-gray-400">Summary</span>
+          </div>
+        </li>
+      </ol>
+    </nav>
+  </div>
+
+  <!-- Statistics Cards Row -->
+  <div class="grid gap-4 mb-4 xl:grid-cols-4">
+    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+      <div class="flex items-center">
+        <div class="p-2 mr-4 bg-blue-100 rounded-lg dark:bg-blue-900">
+          <svg class="w-6 h-6 text-blue-600 dark:text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Tasks</p>
+          <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ crawler_tasks.count }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+      <div class="flex items-center">
+        <div class="p-2 mr-4 bg-green-100 rounded-lg dark:bg-green-900">
+          <svg class="w-6 h-6 text-green-600 dark:text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Scheduled Tasks</p>
+          <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ scheduled_tasks.count }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+      <div class="flex items-center">
+        <div class="p-2 mr-4 bg-cyan-100 rounded-lg dark:bg-cyan-900">
+          <svg class="w-6 h-6 text-cyan-600 dark:text-cyan-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Active Configs</p>
+          <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ crawler_configs.count }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+      <div class="flex items-center">
+        <div class="p-2 mr-4 bg-yellow-100 rounded-lg dark:bg-yellow-900">
+          <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Seed URLs</p>
+          <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ seed_urls.count }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts and Tables Row -->
+  <div class="grid gap-4 xl:grid-cols-3">
+    <!-- Task Trends Chart -->
+    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Task Trends</h3>
+        <div class="flex items-center space-x-2">
+          <button class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">This Week</button>
+          <button class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">This Month</button>
+        </div>
+      </div>
+      <div class="chart-area" style="height: 300px;">
+        <canvas id="tasksTrendChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Recent Tasks -->
+    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Recent Tasks</h3>
+      {% include "pages/tasks/partials/recent_tasks.html" %}
+    </div>
+  </div>
+
+  <!-- Scheduled Tasks Row -->
+  <div class="mt-4">
+    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Scheduled Tasks</h3>
+      {% include "pages/tasks/partials/scheduled_table.html" %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const ctx = document.getElementById('tasksTrendChart');
+  if (!ctx) return;
+
+  // Placeholder aggregated data; in future you can compute from TaskResult/CrawlerTask
+  const labels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const created = [4, 3, 5, 2, 6, 4, 7];
+  const completed = [3, 3, 4, 2, 5, 3, 6];
+
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { 
+          label: 'Created', 
+          data: created, 
+          borderColor: '#3b82f6', 
+          backgroundColor: 'rgba(59, 130, 246, 0.1)', 
+          tension: 0.3,
+          fill: true
+        },
+        { 
+          label: 'Completed', 
+          data: completed, 
+          borderColor: '#10b981', 
+          backgroundColor: 'rgba(16, 185, 129, 0.1)', 
+          tension: 0.3,
+          fill: true
+        },
+      ]
+    },
+    options: { 
+      responsive: true, 
+      maintainAspectRatio: false,
+      plugins: { 
+        legend: { 
+          display: true,
+          position: 'top'
+        } 
+      }, 
+      scales: { 
+        y: { 
+          beginAtZero: true,
+          grid: {
+            color: 'rgba(0,0,0,0.1)'
+          }
+        },
+        x: {
+          grid: {
+            color: 'rgba(0,0,0,0.1)'
+          }
+        }
+      } 
+    }
+  });
+});
+</script>
+{% endblock %}
+
