@@ -223,6 +223,16 @@
                                 <a href="{% url 'common:news_articles_list' %}" class="text-base text-gray-900 rounded-lg flex items-center p-2 group hover:bg-gray-100 transition duration-75 pl-11 dark:text-gray-200 dark:hover:bg-gray-700 {% if 'news_articles' in segment %} bg-gray-100 dark:bg-gray-700 {% endif %}">News Articles</a>
                             </li>
                             {% endif %}
+                            {% if sidebar_config.SHOW_CRUD_NEWS_ARTICLE_RAW_URLS %}
+                            <li>
+                                <a href="{% url 'common:news_article_raw_urls_list' %}" class="text-base text-gray-900 rounded-lg flex items-center p-2 group hover:bg-gray-100 transition duration-75 pl-11 dark:text-gray-200 dark:hover:bg-gray-700 {% if 'news_article_raw_urls' in segment %} bg-gray-100 dark:bg-gray-700 {% endif %}">Raw URLs</a>
+                            </li>
+                            {% endif %}
+                            {% if sidebar_config.SHOW_CRUD_NEWS_ARTICLE_CLEAN_URLS %}
+                            <li>
+                                <a href="{% url 'common:news_article_clean_urls_list' %}" class="text-base text-gray-900 rounded-lg flex items-center p-2 group hover:bg-gray-100 transition duration-75 pl-11 dark:text-gray-200 dark:hover:bg-gray-700 {% if 'news_article_clean_urls' in segment %} bg-gray-100 dark:bg-gray-700 {% endif %}">Clean URLs</a>
+                            </li>
+                            {% endif %}
                             {% if sidebar_config.SHOW_CRUD_SELECTORS %}
                             <li>
                                 <a href="{% url 'common:selectors_list' %}" class="text-base text-gray-900 rounded-lg flex items-center p-2 group hover:bg-gray-100 transition duration-75 pl-11 dark:text-gray-200 dark:hover:bg-gray-700 {% if 'selectors' in segment %} bg-gray-100 dark:bg-gray-700 {% endif %}">Selectors</a>

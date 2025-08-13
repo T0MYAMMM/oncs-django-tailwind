@@ -2,7 +2,6 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.views import LoginView, PasswordResetView, PasswordChangeView, PasswordResetConfirmView
 from django.views.generic import CreateView
-from apps.common.models import Sales
 from apps.users.models import Profile
 from apps.users.forms import SigninForm, SignupForm, UserPasswordChangeForm, UserSetPasswordForm, UserPasswordResetForm, ProfileForm
 from django.contrib.auth import logout
@@ -17,13 +16,13 @@ from apps.users.utils import user_filter
 # Create your views here.
 
 def index(request):
-
-    salesName = ''
+    news_portal = NewsPortal.objects.all()
+    productName = ''
     
-    if len( Sales.objects.all() ):
-        salesName = Sales.objects.all()[0].ItemName
+    if len( news_portal ):
+        productName = news_portal[0].name
         
-    return HttpResponse("INDEX Users" + ' ' + salesName)
+    return HttpResponse("INDEX Users" + ' ' + productName)
 
 
 

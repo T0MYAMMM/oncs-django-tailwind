@@ -27,15 +27,10 @@ def trigger_error(request):
 
 urlpatterns = [
     path("", include("home.urls")),
+    path("users/", include("apps.users.urls")),
     path("admin/", admin.site.urls),
     path("api/", include("apps.api.urls")),
-    path("users/", include("apps.users.urls")),
-    path("charts/", include("apps.charts.urls")),
-    path("", include("apps.react.urls")),
-    path("tables/", include("apps.tables.urls")),
     path("tasks/", include("apps.tasks.urls", namespace="tasks")),
-    path('payments/', include('apps.payments.urls')),
-    path('', include('apps.file_manager.urls')),
     path('crawler/', include('apps.common.urls')),
     path('accounts/', include('allauth.urls')),
     
@@ -48,8 +43,6 @@ urlpatterns = [
 
     re_path(r'^media/(?P<path>.*)$', serve,{'document_root': settings.MEDIA_ROOT}), 
     re_path(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}), 
- 
-
 ]
 
 urlpatterns += static(settings.CELERY_LOGS_URL, document_root=settings.CELERY_LOGS_DIR)

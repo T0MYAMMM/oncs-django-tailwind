@@ -4,184 +4,515 @@
 {% block title %}Tasks Summary{% endblock title %}
 
 {% block content %}
-<div class="p-4 pt-6 2xl:px-0">
+<main>
   <!-- Page Header -->
-  <div class="mb-4">
-    <h1 class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">Tasks Summary</h1>
-    <nav class="flex mt-2" aria-label="Breadcrumb">
-      <ol class="inline-flex items-center space-x-1 md:space-x-3">
-        <li class="inline-flex items-center">
-          <a href="{% url 'tasks:tasks' %}" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">
-            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-              <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
-            </svg>
-            Tasks
-          </a>
-        </li>
-        <li>
-          <div class="flex items-center">
-            <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-              <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
-            </svg>
-            <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2 dark:text-gray-400">Summary</span>
+  <div class="p-4 bg-white block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5 dark:bg-gray-800 dark:border-gray-700">
+    <div class="w-full mb-1">
+      <div class="mb-4">
+        <nav class="flex mb-5" aria-label="Breadcrumb">
+          <ol class="inline-flex items-center space-x-1 text-sm font-medium md:space-x-2">
+            <li class="inline-flex items-center">
+              <a href="#"
+                class="inline-flex items-center text-gray-700 hover:text-primary-600 dark:text-gray-300 dark:hover:text-white">
+                <svg class="w-5 h-5 mr-2.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z">
+                  </path>
+                </svg>
+                Home
+              </a>
+            </li>
+            <li>
+              <div class="flex items-center">
+                <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd"
+                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                    clip-rule="evenodd"></path>
+                </svg>
+                <a href="#"
+                  class="ml-1 text-gray-700 hover:text-primary-600 md:ml-2 dark:text-gray-300 dark:hover:text-white">Tasks</a>
+              </div>
+            </li>
+            <li>
+              <div class="flex items-center">
+                <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd"
+                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                    clip-rule="evenodd"></path>
+                </svg>
+                <span class="ml-1 text-gray-400 md:ml-2 dark:text-gray-500" aria-current="page">Summary</span>
+              </div>
+            </li>
+          </ol>
+        </nav>
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">Tasks Summary</h1>
+          
+          <!-- Time Filter Controls -->
+          <div class="flex flex-wrap items-center gap-3">
+            <!-- Quick Time Presets -->
+            <div class="flex items-center space-x-2">
+              <button class="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600" data-time="1h">1H</button>
+              <button class="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600" data-time="6h">6H</button>
+              <button class="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600" data-time="24h">24H</button>
+              <button class="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600" data-time="7d">7D</button>
+              <button class="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600" data-time="30d">30D</button>
+            </div>
+            <!-- Custom Time Range -->
+            <div class="flex items-center space-x-2">
+              <input type="datetime-local" id="startTime" class="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+              <span class="text-gray-500 dark:text-gray-400">to</span>
+              <input type="datetime-local" id="endTime" class="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-primary-500 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+              <button id="applyTimeRange" class="px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-lg hover:bg-primary-700 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Apply</button>
+            </div>
           </div>
-        </li>
-      </ol>
-    </nav>
-  </div>
-
-  <!-- Statistics Cards Row -->
-  <div class="grid gap-4 mb-4 xl:grid-cols-4">
-    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-      <div class="flex items-center">
-        <div class="p-2 mr-4 bg-blue-100 rounded-lg dark:bg-blue-900">
-          <svg class="w-6 h-6 text-blue-600 dark:text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-          </svg>
-        </div>
-        <div>
-          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Tasks</p>
-          <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ crawler_tasks.count }}</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-      <div class="flex items-center">
-        <div class="p-2 mr-4 bg-green-100 rounded-lg dark:bg-green-900">
-          <svg class="w-6 h-6 text-green-600 dark:text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
-        </div>
-        <div>
-          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Scheduled Tasks</p>
-          <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ scheduled_tasks.count }}</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-      <div class="flex items-center">
-        <div class="p-2 mr-4 bg-cyan-100 rounded-lg dark:bg-cyan-900">
-          <svg class="w-6 h-6 text-cyan-600 dark:text-cyan-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-          </svg>
-        </div>
-        <div>
-          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Active Configs</p>
-          <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ crawler_configs.count }}</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-      <div class="flex items-center">
-        <div class="p-2 mr-4 bg-yellow-100 rounded-lg dark:bg-yellow-900">
-          <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
-          </svg>
-        </div>
-        <div>
-          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Seed URLs</p>
-          <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ seed_urls.count }}</p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Charts and Tables Row -->
-  <div class="grid gap-4 xl:grid-cols-3">
-    <!-- Task Trends Chart -->
-    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Task Trends</h3>
-        <div class="flex items-center space-x-2">
-          <button class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">This Week</button>
-          <button class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">This Month</button>
+  <!-- Main Content Area -->
+  <div class="p-4">
+    <!-- Statistics Cards Row -->
+    <div class="grid gap-4 mb-6 xl:grid-cols-4">
+      <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+        <div class="flex items-center">
+          <div class="p-2 mr-4 bg-blue-100 rounded-lg dark:bg-blue-900">
+            <svg class="w-6 h-6 text-blue-600 dark:text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Tasks</p>
+            <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ crawler_tasks.count }}</p>
+          </div>
         </div>
       </div>
-      <div class="chart-area" style="height: 300px;">
-        <canvas id="tasksTrendChart"></canvas>
+
+      <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+        <div class="flex items-center">
+          <div class="p-2 mr-4 bg-green-100 rounded-lg dark:bg-green-900">
+            <svg class="w-6 h-6 text-green-600 dark:text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Scheduled Tasks</p>
+            <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ scheduled_tasks.count }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+        <div class="flex items-center">
+          <div class="p-2 mr-4 bg-cyan-100 rounded-lg dark:bg-cyan-900">
+            <svg class="w-6 h-6 text-cyan-600 dark:text-cyan-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Active Configs</p>
+            <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ crawler_configs.count }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+        <div class="flex items-center">
+          <div class="p-2 mr-4 bg-yellow-100 rounded-lg dark:bg-yellow-900">
+            <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Seed URLs</p>
+            <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ seed_urls.count }}</p>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Recent Tasks -->
-    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Recent Tasks</h3>
-      {% include "pages/tasks/partials/recent_tasks.html" %}
+    <!-- Task Trends Chart - Full Width Row -->
+    <div class="mb-6">
+      <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Task Trends</h3>
+          <div class="flex items-center space-x-2">
+            <button class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">This Week</button>
+            <button class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">This Month</button>
+          </div>
+        </div>
+        <div class="chart-area" style="height: 300px;">
+          <canvas id="tasksTrendChart"></canvas>
+        </div>
+      </div>
     </div>
-  </div>
 
-  <!-- Scheduled Tasks Row -->
-  <div class="mt-4">
-    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Scheduled Tasks</h3>
-      {% include "pages/tasks/partials/scheduled_table.html" %}
+    <!-- Metrics Charts Row - Flexible Layout -->
+    <div class="grid gap-6 mb-6 xl:grid-cols-3">
+      <!-- Task Status Distribution -->
+      <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Task Status</h3>
+        <div class="chart-area" style="height: 300px;">
+          <canvas id="taskStatusChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Task Performance Metrics -->
+      <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Task Performance</h3>
+        <div class="chart-area" style="height: 300px;">
+          <canvas id="taskPerformanceChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Error Analysis -->
+      <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Error Analysis</h3>
+        <div class="chart-area" style="height: 300px;">
+          <canvas id="errorAnalysisChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Tasks Row - Full Width -->
+    <div class="mt-6">
+      <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Recent Tasks</h3>
+        {% include "pages/tasks/partials/recent_tasks.html" %}
+      </div>
+    </div>
+
+    <!-- Scheduled Tasks Row -->
+    <div class="mt-6">
+      <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Scheduled Tasks</h3>
+        {% include "pages/tasks/partials/scheduled_table.html" %}
+      </div>
     </div>
   </div>
-</div>
+</main>
 {% endblock %}
 
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+  // Global time filter state
+  let currentTimeRange = '24h';
+  let startTime = null;
+  let endTime = null;
+
+  // Initialize time filter
+  initializeTimeFilter();
+
+  // Task Trends Chart
   const ctx = document.getElementById('tasksTrendChart');
-  if (!ctx) return;
+  if (ctx) {
+    // Placeholder aggregated data; in future you can compute from TaskResult/CrawlerTask
+    const labels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    const created = [4, 3, 5, 2, 6, 4, 7];
+    const completed = [3, 3, 4, 2, 5, 3, 6];
 
-  // Placeholder aggregated data; in future you can compute from TaskResult/CrawlerTask
-  const labels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-  const created = [4, 3, 5, 2, 6, 4, 7];
-  const completed = [3, 3, 4, 2, 5, 3, 6];
-
-  new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [
-        { 
-          label: 'Created', 
-          data: created, 
-          borderColor: '#3b82f6', 
-          backgroundColor: 'rgba(59, 130, 246, 0.1)', 
-          tension: 0.3,
-          fill: true
-        },
-        { 
-          label: 'Completed', 
-          data: completed, 
-          borderColor: '#10b981', 
-          backgroundColor: 'rgba(16, 185, 129, 0.1)', 
-          tension: 0.3,
-          fill: true
-        },
-      ]
-    },
-    options: { 
-      responsive: true, 
-      maintainAspectRatio: false,
-      plugins: { 
-        legend: { 
-          display: true,
-          position: 'top'
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          { 
+            label: 'Created', 
+            data: created, 
+            borderColor: '#3b82f6', 
+            backgroundColor: 'rgba(59, 130, 246, 0.1)', 
+            tension: 0.3,
+            fill: true
+          },
+          { 
+            label: 'Completed', 
+            data: completed, 
+            borderColor: '#10b981', 
+            backgroundColor: 'rgba(16, 185, 129, 0.1)', 
+            tension: 0.3,
+            fill: true
+          },
+        ]
+      },
+      options: { 
+        responsive: true, 
+        maintainAspectRatio: false,
+        plugins: { 
+          legend: { 
+            display: true,
+            position: 'top'
+          } 
+        }, 
+        scales: { 
+          y: { 
+            beginAtZero: true,
+            grid: {
+              color: 'rgba(0,0,0,0.1)'
+            }
+          },
+          x: {
+            grid: {
+              color: 'rgba(0,0,0,0.1)'
+            }
+          }
         } 
-      }, 
-      scales: { 
-        y: { 
-          beginAtZero: true,
-          grid: {
-            color: 'rgba(0,0,0,0.1)'
+      }
+    });
+  }
+
+  // Task Status Distribution Chart
+  const statusCtx = document.getElementById('taskStatusChart');
+  if (statusCtx) {
+    // Placeholder data for task status distribution
+    const statusData = {
+      labels: ['Running', 'Completed', 'Failed', 'Pending', 'Scheduled'],
+      datasets: [{
+        data: [12, 45, 8, 15, 20],
+        backgroundColor: [
+          '#3b82f6', // Blue for Running
+          '#10b981', // Green for Completed
+          '#ef4444', // Red for Failed
+          '#f59e0b', // Yellow for Pending
+          '#8b5cf6'  // Purple for Scheduled
+        ],
+        borderWidth: 2,
+        borderColor: '#ffffff'
+      }]
+    };
+
+    new Chart(statusCtx, {
+      type: 'doughnut',
+      data: statusData,
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              padding: 20,
+              usePointStyle: true,
+              font: {
+                size: 12
+              }
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const label = context.label || '';
+                const value = context.parsed;
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = ((value / total) * 100).toFixed(1);
+                return `${label}: ${value} (${percentage}%)`;
+              }
+            }
           }
         },
-        x: {
-          grid: {
-            color: 'rgba(0,0,0,0.1)'
+        cutout: '60%'
+      }
+    });
+  }
+
+  // Task Performance Metrics Chart
+  const performanceCtx = document.getElementById('taskPerformanceChart');
+  if (performanceCtx) {
+    new Chart(performanceCtx, {
+      type: 'bar',
+      data: {
+        labels: ['Avg Execution Time', 'Success Rate', 'Throughput', 'Error Rate'],
+        datasets: [{
+          label: 'Performance Metrics',
+          data: [2.5, 87, 45, 13],
+          backgroundColor: [
+            '#3b82f6', // Blue
+            '#10b981', // Green
+            '#f59e0b', // Yellow
+            '#ef4444'  // Red
+          ],
+          borderWidth: 1,
+          borderColor: '#ffffff'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: {
+              color: 'rgba(0,0,0,0.1)'
+            }
+          },
+          x: {
+            grid: {
+              display: false
+            }
           }
         }
-      } 
+      }
+    });
+  }
+
+  // Error Analysis Chart
+  const errorCtx = document.getElementById('errorAnalysisChart');
+  if (errorCtx) {
+    new Chart(errorCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Network Timeout', 'Parse Error', 'Rate Limited', 'Invalid URL', 'Server Error'],
+        datasets: [{
+          data: [35, 25, 20, 15, 5],
+          backgroundColor: [
+            '#ef4444', // Red
+            '#f59e0b', // Yellow
+            '#8b5cf6', // Purple
+            '#3b82f6', // Blue
+            '#10b981'  // Green
+          ],
+          borderWidth: 2,
+          borderColor: '#ffffff'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              padding: 15,
+              usePointStyle: true,
+              font: {
+                size: 11
+              }
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const label = context.label || '';
+                const value = context.parsed;
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = ((value / total) * 100).toFixed(1);
+                return `${label}: ${value} (${percentage}%)`;
+              }
+            }
+          }
+        },
+        cutout: '50%'
+      }
+    });
+  }
+
+  // Time Filter Functions
+  function initializeTimeFilter() {
+    // Set default time range
+    setTimeRange('24h');
+    
+    // Add event listeners for quick time buttons
+    document.querySelectorAll('[data-time]').forEach(button => {
+      button.addEventListener('click', function() {
+        const timeRange = this.getAttribute('data-time');
+        setTimeRange(timeRange);
+        updateActiveButton(timeRange);
+        refreshAllCharts();
+      });
+    });
+
+    // Add event listener for custom time range
+    document.getElementById('applyTimeRange').addEventListener('click', function() {
+      const start = document.getElementById('startTime').value;
+      const end = document.getElementById('endTime').value;
+      
+      if (start && end) {
+        startTime = new Date(start);
+        endTime = new Date(end);
+        currentTimeRange = 'custom';
+        updateActiveButton('custom');
+        refreshAllCharts();
+      }
+    });
+
+    // Set initial active button
+    updateActiveButton('24h');
+  }
+
+  function setTimeRange(timeRange) {
+    currentTimeRange = timeRange;
+    const now = new Date();
+    
+    switch(timeRange) {
+      case '1h':
+        startTime = new Date(now.getTime() - (60 * 60 * 1000));
+        endTime = now;
+        break;
+      case '6h':
+        startTime = new Date(now.getTime() - (6 * 60 * 60 * 1000));
+        endTime = now;
+        break;
+      case '24h':
+        startTime = new Date(now.getTime() - (24 * 60 * 60 * 1000));
+        endTime = now;
+        break;
+      case '7d':
+        startTime = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
+        endTime = now;
+        break;
+      case '30d':
+        startTime = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
+        endTime = now;
+        break;
     }
-  });
+
+    // Update datetime inputs
+    if (startTime && endTime) {
+      document.getElementById('startTime').value = startTime.toISOString().slice(0, 16);
+      document.getElementById('endTime').value = endTime.toISOString().slice(0, 16);
+    }
+  }
+
+  function updateActiveButton(activeTime) {
+    // Remove active state from all buttons
+    document.querySelectorAll('[data-time]').forEach(button => {
+      button.classList.remove('bg-primary-600', 'text-white');
+      button.classList.add('bg-gray-100', 'text-gray-700');
+    });
+
+    // Add active state to selected button
+    if (activeTime !== 'custom') {
+      const activeButton = document.querySelector(`[data-time="${activeTime}"]`);
+      if (activeButton) {
+        activeButton.classList.remove('bg-gray-100', 'text-gray-700');
+        activeButton.classList.add('bg-primary-600', 'text-white');
+      }
+    }
+  }
+
+  function refreshAllCharts() {
+    // In a real implementation, you would fetch new data based on the time range
+    // and update all charts. For now, we'll just log the time range change.
+    console.log(`Time range changed to: ${currentTimeRange}`);
+    console.log(`Start time: ${startTime}`);
+    console.log(`End time: ${endTime}`);
+    
+    // Here you would typically:
+    // 1. Make API calls to fetch data for the selected time range
+    // 2. Update all chart data
+    // 3. Refresh the statistics cards
+    // 4. Update the recent tasks and scheduled tasks tables
+  }
 });
 </script>
 {% endblock %}

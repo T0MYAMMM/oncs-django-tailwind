@@ -4,135 +4,160 @@
 {% block title %}Crawler Tasks{% endblock title %}
 
 {% block content %}
-<div class="p-4 pt-6 2xl:px-0">
+<main>
   <!-- Page Header -->
-  <div class="mb-4">
-    <h1 class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">Crawler Tasks</h1>
-    <nav class="flex mt-2" aria-label="Breadcrumb">
-      <ol class="inline-flex items-center space-x-1 md:space-x-3">
-        <li class="inline-flex items-center">
-          <a href="{% url 'tasks:tasks' %}" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">
-            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-              <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
+  <div class="p-4 bg-white block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5 dark:bg-gray-800 dark:border-gray-700">
+    <div class="w-full mb-1">
+      <div class="mb-4">
+        <nav class="flex mb-5" aria-label="Breadcrumb">
+          <ol class="inline-flex items-center space-x-1 text-sm font-medium md:space-x-2">
+            <li class="inline-flex items-center">
+              <a href="#"
+                class="inline-flex items-center text-gray-700 hover:text-primary-600 dark:text-gray-300 dark:hover:text-white">
+                <svg class="w-5 h-5 mr-2.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z">
+                  </path>
+                </svg>
+                Home
+              </a>
+            </li>
+            <li>
+              <div class="flex items-center">
+                <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd"
+                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                    clip-rule="evenodd"></path>
+                </svg>
+                <a href="{% url 'tasks:tasks' %}"
+                  class="ml-1 text-gray-700 hover:text-primary-600 md:ml-2 dark:text-gray-300 dark:hover:text-white">Tasks</a>
+              </div>
+            </li>
+            <li>
+              <div class="flex items-center">
+                <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd"
+                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                    clip-rule="evenodd"></path>
+                </svg>
+                <span class="ml-1 text-gray-400 md:ml-2 dark:text-gray-500" aria-current="page">Crawler</span>
+              </div>
+            </li>
+          </ol>
+        </nav>
+        <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">Crawler Tasks</h1>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="p-4">
+    <!-- Task Creation Cards Row -->
+    <div class="grid gap-6 mb-6 xl:grid-cols-2">
+      <!-- Create Single Task -->
+      <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+        <div class="flex items-center mb-4">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+            <svg class="w-5 h-5 mr-2 inline text-blue-600 dark:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
             </svg>
-            Tasks
-          </a>
-        </li>
-        <li>
-          <div class="flex items-center">
-            <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-              <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+            Create Single Task
+          </h3>
+        </div>
+        {% include "pages/tasks/partials/create_one_off.html" %}
+      </div>
+
+      <!-- Create Scheduled Task -->
+      <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+        <div class="flex items-center mb-4">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+            <svg class="w-5 h-5 mr-2 inline text-blue-600 dark:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
-            <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2 dark:text-gray-400">Crawler</span>
+            Create Scheduled Task
+          </h3>
+        </div>
+        {% include "pages/tasks/partials/create_scheduled.html" %}
+      </div>
+    </div>
+
+    <!-- Statistics Cards Row -->
+    <div class="grid gap-4 mb-6 xl:grid-cols-4">
+      <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+        <div class="flex items-center">
+          <div class="p-2 mr-4 bg-blue-100 rounded-lg dark:bg-blue-900">
+            <svg class="w-6 h-6 text-blue-600 dark:text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+            </svg>
           </div>
-        </li>
-      </ol>
-    </nav>
-  </div>
-
-  <!-- Task Creation Cards Row -->
-  <div class="grid gap-4 mb-4 xl:grid-cols-2">
-    <!-- Create Single Task -->
-    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-          <svg class="w-5 h-5 mr-2 inline text-blue-600 dark:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-          </svg>
-          Create Single Task
-        </h3>
-      </div>
-      {% include "pages/tasks/partials/create_one_off.html" %}
-    </div>
-
-    <!-- Create Scheduled Task -->
-    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-          <svg class="w-5 h-5 mr-2 inline text-blue-600 dark:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
-          Create Scheduled Task
-        </h3>
-      </div>
-      {% include "pages/tasks/partials/create_scheduled.html" %}
-    </div>
-  </div>
-
-  <!-- Statistics Cards Row -->
-  <div class="grid gap-4 mb-4 xl:grid-cols-4">
-    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-      <div class="flex items-center">
-        <div class="p-2 mr-4 bg-blue-100 rounded-lg dark:bg-blue-900">
-          <svg class="w-6 h-6 text-blue-600 dark:text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-          </svg>
-        </div>
-        <div>
-          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Tasks</p>
-          <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ crawler_tasks.count }}</p>
+          <div>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Tasks</p>
+            <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ crawler_tasks.count }}</p>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-      <div class="flex items-center">
-        <div class="p-2 mr-4 bg-green-100 rounded-lg dark:bg-green-900">
-          <svg class="w-6 h-6 text-green-600 dark:text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
+      <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+        <div class="flex items-center">
+          <div class="p-2 mr-4 bg-green-100 rounded-lg dark:bg-green-900">
+            <svg class="w-6 h-6 text-green-600 dark:text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Scheduled Tasks</p>
+            <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ scheduled_tasks.count }}</p>
+          </div>
         </div>
-        <div>
-          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Scheduled Tasks</p>
-          <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ scheduled_tasks.count }}</p>
+      </div>
+
+      <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+        <div class="flex items-center">
+          <div class="p-2 mr-4 bg-cyan-100 rounded-lg dark:bg-cyan-900">
+            <svg class="w-6 h-6 text-cyan-600 dark:text-cyan-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Active Configs</p>
+            <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ crawler_configs.count }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+        <div class="flex items-center">
+          <div class="p-2 mr-4 bg-yellow-100 rounded-lg dark:bg-yellow-900">
+            <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Seed URLs</p>
+            <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ seed_urls.count }}</p>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-      <div class="flex items-center">
-        <div class="p-2 mr-4 bg-cyan-100 rounded-lg dark:bg-cyan-900">
-          <svg class="w-6 h-6 text-cyan-600 dark:text-cyan-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-          </svg>
-        </div>
-        <div>
-          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Active Configs</p>
-          <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ crawler_configs.count }}</p>
-        </div>
+    <!-- Tables Row -->
+    <div class="space-y-6">
+      <!-- Recent Tasks -->
+      <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Recent Tasks</h3>
+        {% include "pages/tasks/partials/recent_tasks.html" %}
       </div>
-    </div>
 
-    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-      <div class="flex items-center">
-        <div class="p-2 mr-4 bg-yellow-100 rounded-lg dark:bg-yellow-900">
-          <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
-          </svg>
-        </div>
-        <div>
-          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Seed URLs</p>
-          <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ seed_urls.count }}</p>
-        </div>
+      <!-- Scheduled Tasks -->
+      <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Scheduled Tasks</h3>
+        {% include "pages/tasks/partials/scheduled_table.html" %}
       </div>
     </div>
   </div>
-
-  <!-- Tables Row -->
-  <div class="grid gap-4 xl:grid-cols-3">
-    <!-- Recent Tasks -->
-    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Recent Tasks</h3>
-      {% include "pages/tasks/partials/recent_tasks.html" %}
-    </div>
-
-    <!-- Scheduled Tasks -->
-    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Scheduled Tasks</h3>
-      {% include "pages/tasks/partials/scheduled_table.html" %}
-    </div>
-  </div>
-</div>
+</main>
 {% endblock %}
 

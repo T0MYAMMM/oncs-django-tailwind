@@ -49,13 +49,7 @@ INSTALLED_APPS = [
     "apps.common",
     "apps.users",
     "apps.api",
-    "apps.charts", 
-    "apps.tables",
     "apps.tasks",
-    "apps.payments",
-    "apps.file_manager",
-    "apps.react",
-
     "django_celery_results",
 
     'rest_framework',
