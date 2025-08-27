@@ -9,6 +9,7 @@ build/
 env
 env_linux
 
+.env
 #src
 #*.sqlite*
 
