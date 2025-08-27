@@ -1,0 +1,2 @@
+{"ts": "2025-08-19T05:49:41.916+00:00Z", "level": "INFO", "logger": "scraper.seed", "msg": "seed.inserted", "taskName": null, "event": "seed.inserted", "count": 1323}
+{"ts": "2025-08-19T05:49:41.918+00:00Z", "level": "INFO", "logger": "kafka.conn", "msg": "<BrokerConnection client_id=kafka-python-producer-1, node_id=bootstrap-1 host=10.130.137.100:9092 <connecting> [IPv4 ('10.130.137.100', 9092)]>: connecting to 10.130.137.100:9092 [('10.130.137.100', 9092) IPv4]", "taskName": null}

@@ -7,6 +7,7 @@
         <th scope="col" class="px-6 py-3">Portal</th>
         <th scope="col" class="px-6 py-3">Status</th>
         <th scope="col" class="px-6 py-3">Job ID</th>
+        <th scope="col" class="px-6 py-3">Error Message</th>
         <th scope="col" class="px-6 py-3">Created</th>
         <th scope="col" class="px-6 py-3">Actions</th>
       </tr>
@@ -18,6 +19,7 @@
         <td class="px-6 py-4">{{ task.crawler_config.name }}</td>
         <td class="px-6 py-4">{{ task.crawler_config.portal.name }}</td>
         <td class="px-6 py-4">
+          <!-- Debug: Status={{ task.status }} -->
           {% if task.status == 'pending' %}
             <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-yellow-900 dark:text-yellow-300">Pending</span>
           {% elif task.status == 'running' %}
@@ -35,6 +37,18 @@
             <code class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">{{ task.scrapyd_job_id }}</code>
           {% else %}
             <span class="text-gray-400 text-xs">Not available</span>
+          {% endif %}
+        </td>
+        <td class="px-6 py-4">
+          <!-- Debug: Task ID={{ task.id }}, Error={{ task.error_message|default:"No error message" }} -->
+          {% if task.error_message %}
+            <div class="max-w-xs">
+              <span class="text-red-600 text-xs bg-red-100 dark:bg-red-900 dark:text-red-300 px-2 py-1 rounded cursor-help" title="{{ task.error_message }}">
+                {{ task.error_message|truncatechars:50 }}
+              </span>
+            </div>
+          {% else %}
+            <span class="text-gray-400 text-xs">-</span>
           {% endif %}
         </td>
         <td class="px-6 py-4">{{ task.created_at|date:"M d, Y H:i" }}</td>
@@ -73,7 +87,7 @@
       </tr>
       {% empty %}
       <tr>
-        <td colspan="7" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">No crawler tasks found</td>
+        <td colspan="8" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">No crawler tasks found</td>
       </tr>
       {% endfor %}
     </tbody>

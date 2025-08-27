@@ -3,7 +3,6 @@
 {% get_providers as socialaccount_providers %}
 
 
-
 {% block content %}
 
     <div class="flex flex-col items-center justify-center px-6 pt-8 mx-auto md:h-screen pt:mt-0 dark:bg-gray-900">
@@ -16,12 +15,6 @@
             <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
                 Sign IN
             </h2>
-            <p>
-                <span>ADMIN: admin / Pass12__</span>
-                <br />
-                <span>USER: test / Pass12__</span>
-            </p>
-
 
             {% if form.non_field_errors %}
                 {% for error in form.non_field_errors %}

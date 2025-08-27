@@ -233,7 +233,7 @@ def execute_crawler_task(self, crawler_task_id: int):
         jobid = response_json.get('jobid') or response_json.get('jobid'.upper()) or f"crawler_task_{crawler_task.id}_{int(time.time())}"
         print(f"DEBUG: Extracted jobid: {jobid}")
 
-        # Update task status to completed (queued in Scrapyd)
+        # Update task status to completed (queued in Scrapyd) - only after successful Scrapyd call
         crawler_task.status = 'completed'
         crawler_task.completed_at = timezone.now()
         crawler_task.execution_time = crawler_task.completed_at - crawler_task.started_at
@@ -303,11 +303,14 @@ def execute_crawler_task(self, crawler_task_id: int):
         # Update task status to failed
         try:
             crawler_task = CrawlerTask.objects.get(id=crawler_task_id)
+            print(f"DEBUG: Updating task {crawler_task_id} status to failed")
             crawler_task.status = 'failed'
             crawler_task.error_message = str(e)
             crawler_task.completed_at = timezone.now()
             crawler_task.save()
-        except:
+            print(f"DEBUG: Task {crawler_task_id} status updated to failed successfully")
+        except Exception as update_error:
+            print(f"ERROR: Failed to update task {crawler_task_id} status: {str(update_error)}")
             pass
         
         return {

@@ -51,7 +51,7 @@
                 </nav>
 
                 <!-- Title -->
-                <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">All configs</h1>
+                <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">All crawler configs</h1>
             </div>
 
             <!-- Search and filters -->
@@ -167,6 +167,14 @@
                                 </th>
                                 <th scope="col"
                                     class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
+                                    Seed URLs
+                                </th>
+                                <th scope="col"
+                                    class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
+                                    Proxy & Headers
+                                </th>
+                                <th scope="col"
+                                    class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
                                     Custom Settings
                                 </th>
                                 <th scope="col"
@@ -187,7 +195,7 @@
                         <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
                             {% if page_obj %}
                                 {% for config in page_obj %}
-                                <tr class="hover:bg-gray-100 dark:hover:bg-gray-700" data-config-id="{{ config.pk }}" data-portal-id="{{ config.portal_id }}" data-item-selector-id="{{ config.item_selector_id }}" data-custom-settings='{{ config.custom_settings|escapejs }}'>
+                                <tr class="hover:bg-gray-100 dark:hover:bg-gray-700" data-config-id="{{ config.pk }}" data-portal-id="{{ config.portal_id }}" data-portal-name="{{ config.portal.name }}" data-item-selector-id="{{ config.item_selector_id }}" data-item-selector-query="{{ config.item_selector.query }}" data-custom-settings='{{ config.custom_settings|escapejs }}' data-proxy-settings='{{ config.proxy_settings|escapejs }}' data-custom-headers='{{ config.custom_headers|escapejs }}'>
                                     <td class="w-4 p-4">
                                         <div class="flex items-center">
                                             <input id="checkbox-{{ config.pk }}" aria-describedby="checkbox-1" type="checkbox"
@@ -203,6 +211,28 @@
                                         {{ config.portal.name }}</td>
                                     <td class="max-w-sm p-4 overflow-hidden text-base font-normal text-gray-500 truncate xl:max-w-xs dark:text-gray-400" data-field="item_selector_query">
                                         {{ config.item_selector.query }}</td>
+                                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white" data-field="seed_urls">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                                            {{ config.portal.seed_urls.count }} URLs
+                                        </span>
+                                        {% if config.custom_settings.seed_urls %}
+                                            <br><span class="text-xs text-gray-500 dark:text-gray-400">
+                                                {{ config.custom_settings.seed_urls|length }} selected
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white" data-field="proxy_headers">
+                                        <div class="text-xs">
+                                            {% if config.proxy_settings.enable %}
+                                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">Proxy: ON</span>
+                                            {% else %}
+                                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">Proxy: OFF</span>
+                                            {% endif %}
+                                            {% if config.custom_headers %}
+                                                <br><span class="text-xs text-gray-500 dark:text-gray-400">Headers: {{ config.custom_headers|length }} items</span>
+                                            {% endif %}
+                                        </div>
+                                    </td>
                                     <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white" data-field="custom_settings">
                                         {{ config.custom_settings|truncatechars:50 }}</td>
                                     <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
@@ -211,13 +241,6 @@
                                         {{ config.updated_at }}</td>
 
                                     <td class="p-4 space-x-2 whitespace-nowrap">
-                                        <a href="{% url 'common:crawler_config_seed_urls' config.pk %}" 
-                                            class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
-                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
-                                            </svg>
-                                            Seed URLs
-                                        </a>
                                         <button type="button" 
                                             data-drawer-target="drawer-update-crawler-config-default"
                                             data-drawer-show="drawer-update-crawler-config-default"
@@ -252,7 +275,7 @@
                                 {% endfor %}
                             {% else %}
                                 <tr>
-                                    <td colspan="8" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                                    <td colspan="10" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                                         {% if search_query %}
                                             <div class="flex flex-col items-center justify-center py-8">
                                                 <svg class="w-12 h-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -418,6 +441,9 @@
                 <!-- Seed URLs for selected portal (Create) -->
                 <div>
                     <label for="seed-url-search" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Seed URLs (by selected portal)</label>
+                    <div class="mb-2 text-xs text-gray-500 dark:text-gray-400">
+                        <span id="seed-url-count">0</span> total URLs available for selected portal
+                    </div>
                     <input type="text" id="seed-url-search"
                         class="mb-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                         placeholder="Filter seed URLs...">
@@ -431,7 +457,7 @@
                         <div class="text-sm text-gray-500 dark:text-gray-400">No seed URLs found. Add some in Seed URLs page.</div>
                         {% endfor %}
                     </div>
-                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Only URLs for the selected portal are shown.</p>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Only URLs for the selected portal are shown. Selected URLs will be stored in custom settings.</p>
                 </div>
 
                 <div>
@@ -439,10 +465,28 @@
                     <textarea name="custom_settings" id="custom_settings" rows="4"
                         class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                         placeholder='{"delay": 1, "timeout": 30, "retries": 3} or leave empty for default settings'>{"delay": 1}</textarea>
-                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Enter JSON format settings or leave empty for default settings. Example: {"delay": 1, "timeout": 30}</p>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Enter JSON format settings or leave empty for default settings. Example: {"delay": 1, "timeout": 30}. <strong>Note:</strong> Seed URLs are managed separately above and will be automatically added to custom settings.</p>
                 </div>
 
-                <div class="bottom-0 left-0 flex justify-center w-full pb-4 space-x-4 md:px-4 md:absolute">
+                <!-- Proxy Settings -->
+                <div>
+                    <label for="proxy_settings" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Proxy Settings</label>
+                    <textarea name="proxy_settings" id="proxy_settings" rows="4"
+                        class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                        placeholder='{"enable": false, "auto_rotate": false, "specific_proxy_type": "local"}'>{"enable": false, "auto_rotate": false, "specific_proxy_type": "local"}</textarea>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Configure proxy settings for the spider. Set enable: true to use proxies.</p>
+                </div>
+
+                <!-- Custom Headers -->
+                <div>
+                    <label for="custom_headers" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Custom Headers</label>
+                    <textarea name="custom_headers" id="custom_headers" rows="4"
+                        class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                        placeholder='{"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36...", "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"}'>{"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"}</textarea>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Configure custom HTTP headers for requests. Common headers include User-Agent, Accept, and Accept-Language.</p>
+                </div>
+
+                <div class="flex justify-center w-full pb-4 space-x-4 md:px-4 mt-6">
                     <button type="submit"
                         class="text-white w-full justify-center bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
                         Add config
@@ -533,6 +577,9 @@
                 <!-- Seed URLs for selected portal (Edit) -->
                 <div>
                     <label for="edit-seed-url-search" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Seed URLs (by selected portal)</label>
+                    <div class="mb-2 text-xs text-gray-500 dark:text-gray-400">
+                        <span id="edit-seed-url-count">0</span> total URLs available for selected portal
+                    </div>
                     <input type="text" id="edit-seed-url-search"
                         class="mb-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                         placeholder="Filter seed URLs...">
@@ -546,7 +593,7 @@
                         <div class="text-sm text-gray-500 dark:text-gray-400">No seed URLs found. Add some in Seed URLs page.</div>
                         {% endfor %}
                     </div>
-                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Only URLs for the selected portal are shown.</p>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Only URLs for the selected portal are shown. Selected URLs will be stored in custom settings.</p>
                 </div>
 
                 <div>
@@ -554,10 +601,28 @@
                     <textarea name="custom_settings" id="edit_custom_settings" rows="4"
                         class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                         placeholder='{"delay": 1, "timeout": 30, "retries": 3} or leave empty for default settings'></textarea>
-                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Enter JSON format settings or leave empty for default settings. Example: {"delay": 1, "timeout": 30}</p>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Enter JSON format settings or leave empty for default settings. Example: {"delay": 1, "timeout": 30}. <strong>Note:</strong> Seed URLs are managed separately above and will be automatically added to custom settings.</p>
                 </div>
 
-                <div class="bottom-0 left-0 flex justify-center w-full pb-4 space-x-4 md:px-4 md:absolute">
+                <!-- Proxy Settings -->
+                <div>
+                    <label for="edit_proxy_settings" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Proxy Settings</label>
+                    <textarea name="proxy_settings" id="edit_proxy_settings" rows="4"
+                        class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                        placeholder='{"enable": false, "auto_rotate": false, "specific_proxy_type": "local"}'></textarea>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Configure proxy settings for the spider. Set enable: true to use proxies.</p>
+                </div>
+
+                <!-- Custom Headers -->
+                <div>
+                    <label for="edit_custom_headers" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Custom Headers</label>
+                    <textarea name="custom_headers" id="edit_custom_headers" rows="4"
+                        class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                        placeholder='{"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36...", "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"}'></textarea>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Configure custom HTTP headers for requests. Common headers include User-Agent, Accept, and Accept-Language.</p>
+                </div>
+
+                <div class="flex justify-center w-full pb-4 space-x-4 md:px-4 mt-6">
                     <button type="submit"
                         class="text-white w-full justify-center bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
                         Update crawler config

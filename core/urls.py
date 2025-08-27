@@ -31,7 +31,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("apps.api.urls")),
     path("tasks/", include("apps.tasks.urls", namespace="tasks")),
-    path('crawler/', include('apps.common.urls')),
+    path('common/', include('apps.common.urls')),
     path('accounts/', include('allauth.urls')),
     
     path('api/docs/schema', SpectacularAPIView.as_view(), name='schema'),

@@ -1,5 +1,154 @@
 // Selectors JavaScript functionality
+// Immediately override initDrawers to prevent any drawer initialization
+if (window.initDrawers) {
+    window.initDrawers = function() {
+        console.log('initDrawers blocked immediately');
+        return;
+    };
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    
+    // Debug: Check if Flowbite is loaded
+    console.log('window.FlowbiteInstances:', window.FlowbiteInstances);
+    console.log('window.initFlowbite:', window.initFlowbite);
+    
+    // Completely disable Flowbite drawer functionality
+    if (window.FlowbiteInstances) {
+        // Override the initDrawers method to prevent automatic drawer initialization
+        const originalInitDrawers = window.FlowbiteInstances.initDrawers;
+        if (originalInitDrawers) {
+            window.FlowbiteInstances.initDrawers = function() {
+                console.log('Preventing Flowbite from auto-initializing drawers');
+                // Don't call the original method
+                return;
+            };
+        }
+    }
+    
+    // Also override the global initDrawers function
+    if (window.initDrawers) {
+        window.initDrawers = function() {
+            console.log('Preventing global initDrawers from running');
+            return;
+        };
+    }
+    
+    // Override the Drawer class to prevent any drawer operations
+    if (window.Drawer) {
+        const OriginalDrawer = window.Drawer;
+        window.Drawer = function() {
+            console.log('Preventing Drawer class instantiation');
+            return {
+                show: function() { console.log('Drawer.show() blocked'); },
+                hide: function() { console.log('Drawer.hide() blocked'); },
+                toggle: function() { console.log('Drawer.toggle() blocked'); }
+            };
+        };
+        // Copy static methods if they exist
+        if (OriginalDrawer.getInstance) {
+            window.Drawer.getInstance = function() {
+                console.log('Drawer.getInstance() blocked');
+                return null;
+            };
+        }
+    }
+    
+    // Override initFlowbite to prevent drawer initialization
+    if (window.initFlowbite) {
+        const originalInitFlowbite = window.initFlowbite;
+        window.initFlowbite = function() {
+            console.log('Intercepting initFlowbite to prevent drawer initialization');
+            // Call the original but intercept the drawer part
+            const result = originalInitFlowbite.call(this);
+            
+            // Immediately override initDrawers again after initFlowbite runs
+            if (window.initDrawers) {
+                window.initDrawers = function() {
+                    console.log('Preventing initDrawers from running after initFlowbite');
+                    return;
+                };
+            }
+            
+            return result;
+        };
+    }
+    
+    // Initialize native HTML drawer functionality
+    function initializeDrawers() {
+        const drawerIds = [
+            'drawer-create-selector-default',
+            'drawer-update-selector-default',
+            'drawer-delete-selector-default'
+        ];
+        
+        drawerIds.forEach(drawerId => {
+            const drawer = document.getElementById(drawerId);
+            if (drawer) {
+                console.log(`Initializing native drawer: ${drawerId}`);
+                
+                // Add click event to backdrop for closing
+                const backdrop = drawer.querySelector('[data-drawer-backdrop]');
+                if (backdrop) {
+                    backdrop.addEventListener('click', () => {
+                        closeDrawer(drawerId);
+                    });
+                }
+                
+                // Add escape key support
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && !drawer.classList.contains('translate-x-full')) {
+                        closeDrawer(drawerId);
+                    }
+                });
+            }
+        });
+        
+        // Add click handlers for buttons to open drawers
+        const createButton = document.getElementById('createSelectorButton');
+        if (createButton) {
+            createButton.addEventListener('click', () => {
+                openDrawer('drawer-create-selector-default');
+            });
+        }
+        
+        // Add handlers for edit and delete buttons (these are added dynamically)
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('#updateSelectorButton')) {
+                openDrawer('drawer-update-selector-default');
+            }
+            if (e.target.closest('#deleteSelectorButton')) {
+                openDrawer('drawer-delete-selector-default');
+            }
+        });
+    }
+    
+    // Function to open drawer
+    function openDrawer(drawerId) {
+        const drawer = document.getElementById(drawerId);
+        if (drawer) {
+            drawer.classList.remove('translate-x-full');
+            drawer.classList.add('transform-none');
+            drawer.setAttribute('aria-hidden', 'false');
+            drawer.removeAttribute('inert');
+            console.log(`Opened drawer: ${drawerId}`);
+        }
+    }
+    
+    // Function to close drawer
+    function closeDrawer(drawerId) {
+        const drawer = document.getElementById(drawerId);
+        if (drawer) {
+            drawer.classList.add('translate-x-full');
+            drawer.classList.remove('transform-none');
+            drawer.setAttribute('aria-hidden', 'true');
+            drawer.setAttribute('inert', '');
+            console.log(`Closed drawer: ${drawerId}`);
+        }
+    }
+    
+    // Initialize drawers after a short delay
+    setTimeout(initializeDrawers, 100);
     
     // Search functionality
     const searchInput = document.getElementById('selectors-search');
@@ -113,10 +262,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Handle create form submission
     const createForm = document.querySelector('#drawer-create-selector-default form');
     if (createForm) {
+        console.log('Create form found, adding submit handler');
         createForm.addEventListener('submit', function(e) {
             e.preventDefault();
+            console.log('Form submission intercepted');
             
             const formData = new FormData(this);
+            console.log('Form action:', this.action);
             
             fetch(this.action, {
                 method: 'POST',
@@ -128,22 +280,22 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => {
                 if (response.ok) {
                     // Close drawer and reload page
-                    const drawer = document.getElementById('drawer-create-selector-default');
-                    if (drawer) {
-                        // Use Flowbite drawer hide method
-                        const drawerInstance = window.Drawer.getInstance(drawer);
-                        if (drawerInstance) {
-                            drawerInstance.hide();
-                        } else {
-                            // Fallback: hide the drawer manually
-                            drawer.classList.add('translate-x-full');
-                            drawer.setAttribute('aria-hidden', 'true');
-                        }
-                    }
-                    window.location.reload();
+                    closeDrawer('drawer-create-selector-default');
+                    // Show success message
+                    const successMessage = document.createElement('div');
+                    successMessage.className = 'fixed top-4 right-4 z-50 p-4 bg-green-500 text-white rounded-lg shadow-lg';
+                    successMessage.textContent = 'Selector created successfully!';
+                    document.body.appendChild(successMessage);
+                    
+                    // Remove message and reload after a short delay
+                    setTimeout(() => {
+                        successMessage.remove();
+                        window.location.reload();
+                    }, 1500);
                 } else {
                     // Handle errors
                     console.error('Error creating selector');
+                    alert('Error creating selector. Please try again.');
                 }
             })
             .catch(error => {
@@ -214,7 +366,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (editForm) {
             // Update form action URL
-            editForm.action = `/crawler/selectors/${selectorData.id}/edit/`;
+            editForm.action = `/common/selectors/${selectorData.id}/edit/`;
             
             // Populate form fields
             const portalField = document.getElementById('edit_portal');
@@ -235,7 +387,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (deleteForm) {
             // Update form action URL
-            deleteForm.action = `/crawler/selectors/${selectorData.id}/delete/`;
+            deleteForm.action = `/common/selectors/${selectorData.id}/delete/`;
         }
     }
     

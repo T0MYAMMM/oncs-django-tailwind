@@ -190,7 +190,7 @@ class CrawlerConfigForm(forms.ModelForm):
     
     class Meta:
         model = CrawlerConfig
-        fields = ['name', 'portal', 'item_selector', 'custom_settings']
+        fields = ['name', 'portal', 'item_selector', 'custom_settings', 'proxy_settings', 'custom_headers']
         widgets = {
             'name': forms.TextInput(attrs={
                 'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500',
@@ -205,13 +205,25 @@ class CrawlerConfigForm(forms.ModelForm):
             'custom_settings': forms.Textarea(attrs={
                 'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500',
                 'rows': 5,
-                'placeholder': '{"delay": 1, "timeout": 30, "retries": 3}'
+                'placeholder': '{"delay": 1, "timeout": 30, "retries": 3, "rate_limit": {"max_requests_per_domain": 100, "delay": 1.0}, "domain_restrictions": {"allowed_domains": [], "blocked_domains": []}}'
+            }),
+            'proxy_settings': forms.Textarea(attrs={
+                'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500',
+                'rows': 4,
+                'placeholder': '{"enable": false, "auto_rotate": false, "specific_proxy_type": "local"}'
+            }),
+            'custom_headers': forms.Textarea(attrs={
+                'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500',
+                'rows': 4,
+                'placeholder': '{"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36...", "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"}'
             })
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['custom_settings'].initial = '{"delay": 1}'
+        self.fields['custom_settings'].initial = '{"delay": 1, "rate_limit": {"max_requests_per_domain": 100, "delay": 1.0}, "domain_restrictions": {"allowed_domains": [], "blocked_domains": []}}'
+        self.fields['proxy_settings'].initial = '{"enable": false, "auto_rotate": false, "specific_proxy_type": "local"}'
+        self.fields['custom_headers'].initial = '{"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"}'
 
     def clean_custom_settings(self):
         """Validate JSON format for custom_settings and convert to Python object"""
@@ -228,6 +240,36 @@ class CrawlerConfigForm(forms.ModelForm):
                 return custom_settings
             except json.JSONDecodeError:
                 raise forms.ValidationError("Please enter valid JSON format")
+        return {}
+
+    def clean_proxy_settings(self):
+        """Validate JSON format for proxy_settings and convert to Python object"""
+        import json
+        proxy_settings = self.cleaned_data.get('proxy_settings')
+        if proxy_settings:
+            try:
+                if isinstance(proxy_settings, str):
+                    if proxy_settings.strip() == '' or proxy_settings.strip() == '{}':
+                        return {}
+                    return json.loads(proxy_settings)
+                return proxy_settings
+            except json.JSONDecodeError:
+                raise forms.ValidationError("Please enter valid JSON format for proxy settings")
+        return {}
+
+    def clean_custom_headers(self):
+        """Validate JSON format for custom_headers and convert to Python object"""
+        import json
+        custom_headers = self.cleaned_data.get('custom_headers')
+        if custom_headers:
+            try:
+                if isinstance(custom_headers, str):
+                    if custom_headers.strip() == '' or custom_headers.strip() == '{}':
+                        return {}
+                    return json.loads(custom_headers)
+                return custom_headers
+            except json.JSONDecodeError:
+                raise forms.ValidationError("Please enter valid JSON format for custom headers")
         return {}
 
 

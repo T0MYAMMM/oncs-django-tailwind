@@ -161,3 +161,22 @@
 </main>
 {% endblock %}
 
+{% block extra_js %}
+<script>
+// Auto-refresh page after form submission to show new tasks
+document.addEventListener('DOMContentLoaded', function() {
+    // Get all forms in the page
+    const forms = document.querySelectorAll('form[action*="create"], form[action*="execute"]');
+    
+    forms.forEach(form => {
+        form.addEventListener('submit', function() {
+            // Add a small delay to allow the form to submit
+            setTimeout(() => {
+                window.location.reload();
+            }, 100);
+        });
+    });
+});
+</script>
+{% endblock %}
+

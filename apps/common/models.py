@@ -159,6 +159,10 @@ class CrawlerConfig(TimestampModel):
 	portal = models.ForeignKey(NewsPortal, on_delete=models.CASCADE, related_name='crawler_configs')
 	item_selector = models.ForeignKey(ItemSelector, on_delete=models.CASCADE, related_name='crawler_configs')
 	custom_settings = models.JSONField(default=dict)
+	
+	# NEW FIELDS - Only the essential ones:
+	proxy_settings = models.JSONField(default=dict, help_text="Proxy configuration for the spider")
+	custom_headers = models.JSONField(default=dict, help_text="Custom HTTP headers for requests")
 
 	class Meta:
 		db_table = 'news_crawler_config'

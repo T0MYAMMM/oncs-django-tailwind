@@ -18,17 +18,8 @@
       <input type="text" name="name" id="scheduled_name" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Daily News Crawl">
     </div>
     <div>
-      <label for="scheduled_crawler_config" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Crawler Config</label>
-      <select name="crawler_config" id="scheduled_crawler_config" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-        <option value="">Select crawler config</option>
-        {% for config in crawler_configs %}
-          {% if config.custom_settings and config.custom_settings.seed_urls %}
-            <option value="{{ config.pk }}">{{ config.name }} ({{ config.portal.name }}) - {{ config.custom_settings.seed_urls|length }} seed URLs</option>
-          {% else %}
-            <option value="{{ config.pk }}">{{ config.name }} ({{ config.portal.name }}) - 0 seed URLs</option>
-          {% endif %}
-        {% endfor %}
-      </select>
+      {% load task_filters %}
+      {% include "pages/tasks/partials/searchable_select.html" with field_name="crawler_config" field_id="scheduled_crawler_config" field_label="Crawler Config" options=crawler_configs option_value="pk" option_label="name" option_extra="portal.name" %}
     </div>
     <div>
       <label for="cron_expression" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Cron Expression</label>

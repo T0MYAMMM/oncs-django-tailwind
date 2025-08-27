@@ -1,0 +1,203 @@
+{% comment %}
+  Searchable Select Component
+  Usage: {% include "pages/tasks/partials/searchable_select.html" with field_name="crawler_config" field_id="crawler_config" options=crawler_configs option_value="pk" option_label="name" option_extra="portal.name" %}
+{% endcomment %}
+
+<div class="relative" x-data="searchableSelect('{{ field_id }}')">
+  <label for="{{ field_id }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ field_label|default:"Select Option" }}</label>
+  
+  <!-- Hidden select for form submission -->
+  <select name="{{ field_name }}" id="{{ field_id }}" required class="hidden">
+    <option value="">Select option</option>
+    {% for option in options %}
+      {% if option.portal.seed_urls.count > 0 %}
+        {% if option.custom_settings and option.custom_settings.seed_urls %}
+          <option value="{{ option|getattr:option_value }}" data-search-text="{{ option|getattr:option_label }} {{ option|getattr:option_extra|default:'' }} {{ option.portal.seed_urls.count }} total {{ option.custom_settings.seed_urls|length }} selected">{{ option|getattr:option_label }} ({{ option|getattr:option_extra|default:'N/A' }}) - {{ option.portal.seed_urls.count }} total, {{ option.custom_settings.seed_urls|length }} selected</option>
+        {% else %}
+          <option value="{{ option|getattr:option_value }}" data-search-text="{{ option|getattr:option_label }} {{ option|getattr:option_extra|default:'' }} {{ option.portal.seed_urls.count }} total 0 selected">{{ option|getattr:option_label }} ({{ option|getattr:option_extra|default:'N/A' }}) - {{ option.portal.seed_urls.count }} total, 0 selected</option>
+        {% endif %}
+      {% else %}
+        <option value="{{ option|getattr:option_value }}" data-search-text="{{ option|getattr:option_label }} {{ option|getattr:option_extra|default:'' }} 0 total 0 selected">{{ option|getattr:option_label }} ({{ option|getattr:option_extra|default:'N/A' }}) - 0 total, 0 selected</option>
+      {% endif %}
+    {% endfor %}
+  </select>
+  
+  <!-- Searchable input display -->
+  <div class="relative">
+    <input 
+      type="text" 
+      x-ref="searchInput"
+      placeholder="Search {{ field_label|default:"options" }}... (Type to search, ↑↓ to navigate, Enter to select)"
+      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+      @input="filterOptions()"
+      @focus="showDropdown = true"
+      @click="showDropdown = true"
+      @keydown.escape="showDropdown = false"
+      @keydown.enter.prevent="selectFirstOption()"
+      @keydown.arrow-down.prevent="navigateOptions(1)"
+      @keydown.arrow-up.prevent="navigateOptions(-1)"
+    >
+    
+    <!-- Dropdown arrow -->
+    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+      </svg>
+    </div>
+  </div>
+  
+  <!-- Dropdown options -->
+  <div 
+    x-show="showDropdown" 
+    x-transition:enter="transition ease-out duration-200"
+    x-transition:enter-start="opacity-0 transform scale-95"
+    x-transition:enter-end="opacity-100 transform scale-100"
+    x-transition:leave="transition ease-in duration-150"
+    x-transition:leave-start="opacity-100 transform scale-100"
+    x-transition:leave-end="opacity-0 transform scale-95"
+    class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg dark:bg-gray-700 dark:border-gray-600 max-h-60 overflow-y-auto"
+    @click.away="showDropdown = false"
+  >
+    <!-- Search results count -->
+    <div class="px-4 py-2 text-xs text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-600">
+      <span x-text="`${filteredOptions.length} of ${allOptions.length} options`"></span>
+      <span x-show="searchTerm" x-text="` matching '${searchTerm}'`"></span>
+    </div>
+    <template x-for="(option, index) in filteredOptions" :key="option.value">
+      <div 
+        class="px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150"
+        :class="{ 'bg-blue-100 dark:bg-blue-900': index === selectedIndex }"
+        @click="selectOption(option)"
+        x-text="option.label"
+      ></div>
+    </template>
+    
+    <!-- Show all options button when limited -->
+    <div x-show="!searchTerm && allOptions.length > 50 && filteredOptions.length === 50" class="px-4 py-2 border-t border-gray-200 dark:border-gray-600">
+      <button 
+        @click="showAllOptions()" 
+        class="w-full text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-center"
+      >
+        Show all {{ allOptions.length }} options
+      </button>
+    </div>
+    
+    <!-- No results message -->
+    <div x-show="filteredOptions.length === 0" class="px-4 py-2 text-gray-500 dark:text-gray-400 text-sm">
+      No options found
+    </div>
+  </div>
+  
+  <!-- Selected option display -->
+  <div x-show="selectedOption" class="mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+    <span class="text-sm text-blue-800 dark:text-blue-200">
+      <strong>Selected:</strong> <span x-text="selectedOption.label"></span>
+    </span>
+  </div>
+</div>
+
+<script>
+document.addEventListener('alpine:init', () => {
+  Alpine.data('searchableSelect', (fieldId) => ({
+    showDropdown: false,
+    filteredOptions: [],
+    selectedOption: null,
+    selectedIndex: -1,
+    allOptions: [],
+    searchTerm: '',
+    searchTimeout: null,
+    
+    init() {
+      // Get all options from the hidden select
+      const select = document.getElementById(fieldId);
+      if (!select) {
+        console.error(`Searchable select: Could not find select element with id '${fieldId}'`);
+        return;
+      }
+      
+      this.allOptions = Array.from(select.options).slice(1).map(option => ({
+        value: option.value,
+        label: option.textContent,
+        searchText: option.dataset.searchText || option.textContent
+      }));
+      
+      // Initialize filtered options
+      this.filteredOptions = this.allOptions.slice(0, 50);
+      
+      // Set initial value if one is selected
+      if (select.value) {
+        const option = this.allOptions.find(opt => opt.value === select.value);
+        if (option) {
+          this.selectedOption = option;
+          this.updateSearchInput(option.label);
+        }
+      }
+      
+      console.log(`Searchable select initialized with ${this.allOptions.length} options`);
+    },
+    
+    filterOptions() {
+      this.searchTerm = this.$refs.searchInput.value.toLowerCase();
+      
+      // Clear previous timeout
+      if (this.searchTimeout) {
+        clearTimeout(this.searchTimeout);
+      }
+      
+      // Debounce search for better performance
+      this.searchTimeout = setTimeout(() => {
+        if (!this.searchTerm) {
+          // Limit initial display to first 50 options for performance
+          this.filteredOptions = this.allOptions.slice(0, 50);
+        } else {
+          // Search through all options when user types
+          this.filteredOptions = this.allOptions.filter(option => 
+            option.searchText.toLowerCase().includes(this.searchTerm)
+          );
+        }
+        
+        this.selectedIndex = -1;
+      }, 150); // 150ms debounce
+    },
+    
+    showAllOptions() {
+      this.filteredOptions = [...this.allOptions];
+    },
+    
+    selectOption(option) {
+      this.selectedOption = option;
+      this.updateSearchInput(option.label);
+      this.updateHiddenSelect(option.value);
+      this.showDropdown = false;
+    },
+    
+    selectFirstOption() {
+      if (this.filteredOptions.length > 0) {
+        this.selectOption(this.filteredOptions[0]);
+      }
+    },
+    
+    navigateOptions(direction) {
+      if (this.filteredOptions.length === 0) return;
+      
+      this.selectedIndex = Math.max(0, Math.min(
+        this.selectedIndex + direction, 
+        this.filteredOptions.length - 1
+      ));
+    },
+    
+    updateSearchInput(label) {
+      this.$refs.searchInput.value = label;
+    },
+    
+    updateHiddenSelect(value) {
+      const select = document.getElementById(fieldId);
+      select.value = value;
+      
+      // Trigger change event for form validation
+      const event = new Event('change', { bubbles: true });
+      select.dispatchEvent(event);
+    }
+  }));
+});
+</script>

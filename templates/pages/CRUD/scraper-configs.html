@@ -32,7 +32,7 @@
                                         clip-rule="evenodd"></path>
                                 </svg>
                                 <a href="#"
-                                    class="ml-1 text-gray-700 hover:text-primary-600 md:ml-2 dark:text-gray-300 dark:hover:text-white">Crawler</a>
+                                    class="ml-1 text-gray-700 hover:text-primary-600 md:ml-2 dark:text-gray-300 dark:hover:text-white">Scraper</a>
                             </div>
                         </li>
                         <li>
@@ -51,7 +51,7 @@
                 </nav>
 
                 <!-- Title -->
-                <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">All configs</h1>
+                <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">All scraper configs</h1>
             </div>
 
             <!-- Search and filters -->
@@ -125,8 +125,8 @@
                         </div>
                     </div>
                 </div>
-                <!-- Add new configs button -->
-                <button id="createCrawlerConfigButton"
+                <!-- Add new portals button -->
+                <button id="createScraperConfigButton"
                     class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
                     type="button" data-drawer-target="drawer-create-scraper-config-default"
                     data-drawer-show="drawer-create-scraper-config-default" aria-controls="drawer-create-scraper-config-default"
@@ -187,7 +187,7 @@
                         <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
                             {% if page_obj %}
                                 {% for config in page_obj %}
-                                <tr class="hover:bg-gray-100 dark:hover:bg-gray-700" data-config-id="{{ config.pk }}">
+                                <tr class="hover:bg-gray-100 dark:hover:bg-gray-700" data-config-id="{{ config.pk }}" data-portal-id="{{ config.portal_id }}" data-item-selector-id="{{ config.item_selector_id }}" data-custom-settings='{{ config.custom_settings|escapejs }}'>
                                     <td class="w-4 p-4">
                                         <div class="flex items-center">
                                             <input id="checkbox-{{ config.pk }}" aria-describedby="checkbox-1" type="checkbox"
@@ -289,52 +289,55 @@
     </div>
 
     <!-- Pagination -->
-    <div
-        class="sticky bottom-0 right-0 items-center w-full p-4 bg-white border-t border-gray-200 sm:flex sm:justify-between dark:bg-gray-800 dark:border-gray-700">
+    {% if page_obj.has_other_pages %}
+    <div class="sticky bottom-0 right-0 items-center w-full p-4 bg-white border-t border-gray-200 sm:flex sm:justify-between dark:bg-gray-800 dark:border-gray-700">
         <div class="flex items-center mb-4 sm:mb-0">
-            <a href="#"
-                class="inline-flex justify-center p-1 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
-                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd"
-                        d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                        clip-rule="evenodd"></path>
-                </svg>
-            </a>
-            <a href="#"
-                class="inline-flex justify-center p-1 mr-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
-                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd"
-                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                        clip-rule="evenodd"></path>
-                </svg>
-            </a>
-            <span class="text-sm font-normal text-gray-500 dark:text-gray-400">Showing <span
-                    class="font-semibold text-gray-900 dark:text-white">1-20</span> of <span
-                    class="font-semibold text-gray-900 dark:text-white">2290</span></span>
+            <span class="text-sm font-normal text-gray-500 dark:text-gray-400">
+                Showing <span class="font-semibold text-gray-900 dark:text-white">{{ page_obj.start_index }}-{{ page_obj.end_index }}</span> of <span class="font-semibold text-gray-900 dark:text-white">{{ page_obj.paginator.count }}</span>
+            </span>
         </div>
         <div class="flex items-center space-x-3">
-            <a href="#"
-                class="inline-flex items-center justify-center flex-1 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
-                <svg class="w-5 h-5 mr-1 -ml-1" fill="currentColor" viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd"
-                        d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                        clip-rule="evenodd"></path>
-                </svg>
-                Previous
-            </a>
-            <a href="#"
-                class="inline-flex items-center justify-center flex-1 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
-                Next
-                <svg class="w-5 h-5 ml-1 -mr-1" fill="currentColor" viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd"
-                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                        clip-rule="evenodd"></path>
-                </svg>
-            </a>
+            {% if page_obj.has_previous %}
+                <a href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}" 
+                   class="inline-flex justify-center p-1 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
+                    <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M15.707 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L11.414 9H17a1 1 0 110 2h-5.586l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"></path>
+                    </svg>
+                </a>
+                <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}" 
+                   class="inline-flex justify-center p-1 mr-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
+                    <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                </a>
+            {% endif %}
+            
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <span class="inline-flex items-center justify-center w-8 h-8 text-sm font-medium text-white bg-primary-700 rounded-lg dark:bg-primary-600">{{ num }}</span>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}" 
+                       class="inline-flex items-center justify-center w-8 h-8 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-600">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+            
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}" 
+                   class="inline-flex justify-center p-1 ml-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
+                    <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                </a>
+                <a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}" 
+                   class="inline-flex justify-center p-1 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
+                    <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414-1.414L8.586 10 3.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                    </svg>
+                </a>
+            {% endif %}
         </div>
     </div>
+    {% endif %}
 
     <!-- Add Scraper Config Drawer -->
     <div id="drawer-create-scraper-config-default"
@@ -354,6 +357,7 @@
             </svg>
             <span class="sr-only">Close menu</span>
         </button>
+        
         <form method="post" action="{% url 'common:scraper_config_create' %}">
             {% csrf_token %}
             <div class="space-y-4">
@@ -366,37 +370,75 @@
 
                 <div>
                     <label for="portal" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Portal</label>
-                    <select name="portal" id="portal" required
-                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                        <option value="">Select portal</option>
-                        {% for portal in portals %}
-                            <option value="{{ portal.pk }}">{{ portal.name }} ({{ portal.domain }})</option>
-                        {% endfor %}
-                    </select>
+                    <div class="relative">
+                        <input type="text" id="portal-search" 
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                            placeholder="Search for portals..." autocomplete="off">
+                        <input type="hidden" name="portal" id="portal" required>
+                        <div id="portal-dropdown" class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto dark:bg-gray-700 dark:border-gray-600">
+                            {% for portal in portals %}
+                                <div class="portal-option px-4 py-2 hover:bg-gray-100 cursor-pointer dark:hover:bg-gray-600 dark:text-white" 
+                                     data-value="{{ portal.pk }}" 
+                                     data-text="{{ portal.name }} ({{ portal.domain }})">
+                                    <div class="font-medium">{{ portal.name }}</div>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">{{ portal.domain }}</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
                 </div>
 
                 <div>
                     <label for="item_selector" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Item Selector</label>
-                    <select name="item_selector" id="item_selector" required
-                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                        <option value="">Select item selector</option>
-                        {% for selector in selectors %}
-                            <option value="{{ selector.pk }}">{{ selector.query }} ({{ selector.get_item_display }})</option>
+                    <div class="relative">
+                        <input type="text" id="selector-search" 
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                            placeholder="Search for selectors..." autocomplete="off">
+                        <input type="hidden" name="item_selector" id="item_selector" required>
+                        <div id="selector-dropdown" class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto dark:bg-gray-700 dark:border-gray-600">
+                            {% for selector in selectors %}
+                                <div class="selector-option px-4 py-2 hover:bg-gray-100 cursor-pointer dark:hover:bg-gray-600 dark:text-white" 
+                                     data-value="{{ selector.pk }}" 
+                                     data-text="{{ selector.query }} ({{ selector.get_item_display }})">
+                                    <div class="font-medium">{{ selector.query }}</div>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">{{ selector.get_item_display }} - {{ selector.get_method_display }}</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seed URLs for selected portal (Create) -->
+                <div>
+                    <label for="seed-url-search" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Seed URLs (by selected portal)</label>
+                    <input type="text" id="seed-url-search"
+                        class="mb-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                        placeholder="Filter seed URLs...">
+                    <div id="seed-url-list" class="max-h-56 overflow-y-auto border border-gray-200 rounded-lg p-2 dark:border-gray-700">
+                        {% for seed in seed_urls %}
+                        <label class="flex items-start space-x-2 py-1 px-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer seed-item" data-portal="{{ seed.portal_id }}">
+                            <input type="checkbox" class="mt-1 seed-checkbox" name="seed_urls" value="{{ seed.url }}">
+                            <span class="text-sm text-gray-700 dark:text-gray-300 break-all">{{ seed.url }}</span>
+                        </label>
+                        {% empty %}
+                        <div class="text-sm text-gray-500 dark:text-gray-400">No seed URLs found. Add some in Seed URLs page.</div>
                         {% endfor %}
-                    </select>
+                    </div>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Only URLs for the selected portal are shown.</p>
                 </div>
 
                 <div>
                     <label for="custom_settings" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Custom Settings</label>
                     <textarea name="custom_settings" id="custom_settings" rows="4"
                         class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                        placeholder='{"extract_images": true, "extract_metadata": true}'></textarea>
+                        placeholder='{"delay": 1, "timeout": 30, "retries": 3} or leave empty for default settings'>{"delay": 1}</textarea>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Enter JSON format settings or leave empty for default settings. Example: {"delay": 1, "timeout": 30}</p>
                 </div>
 
                 <div class="bottom-0 left-0 flex justify-center w-full pb-4 space-x-4 md:px-4 md:absolute">
                     <button type="submit"
                         class="text-white w-full justify-center bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
-                        Add scraper config
+                        Add config
                     </button>
                     <button type="button" data-drawer-dismiss="drawer-create-scraper-config-default"
                         aria-controls="drawer-create-scraper-config-default"
@@ -443,31 +485,69 @@
 
                 <div>
                     <label for="edit_portal" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Portal</label>
-                    <select name="portal" id="edit_portal" required
-                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                        <option value="">Select portal</option>
-                        {% for portal in portals %}
-                            <option value="{{ portal.pk }}">{{ portal.name }} ({{ portal.domain }})</option>
-                        {% endfor %}
-                    </select>
+                    <div class="relative">
+                        <input type="text" id="edit-portal-search" 
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                            placeholder="Search for portals..." autocomplete="off">
+                        <input type="hidden" name="portal" id="edit_portal" required>
+                        <div id="edit-portal-dropdown" class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto dark:bg-gray-700 dark:border-gray-600">
+                            {% for portal in portals %}
+                                <div class="edit-portal-option px-4 py-2 hover:bg-gray-100 cursor-pointer dark:hover:bg-gray-600 dark:text-white" 
+                                     data-value="{{ portal.pk }}" 
+                                     data-text="{{ portal.name }} ({{ portal.domain }})">
+                                    <div class="font-medium">{{ portal.name }}</div>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">{{ portal.domain }}</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
                 </div>
 
                 <div>
                     <label for="edit_item_selector" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Item Selector</label>
-                    <select name="item_selector" id="edit_item_selector" required
-                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                        <option value="">Select item selector</option>
-                        {% for selector in selectors %}
-                            <option value="{{ selector.pk }}">{{ selector.query }} ({{ selector.get_item_display }})</option>
+                    <div class="relative">
+                        <input type="text" id="edit-selector-search" 
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                            placeholder="Search for selectors..." autocomplete="off">
+                        <input type="hidden" name="item_selector" id="edit_item_selector" required>
+                        <div id="edit-selector-dropdown" class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto dark:bg-gray-700 dark:border-gray-600">
+                            {% for selector in selectors %}
+                                <div class="edit-selector-option px-4 py-2 hover:bg-gray-100 cursor-pointer dark:hover:bg-gray-600 dark:text-white" 
+                                     data-value="{{ selector.pk }}" 
+                                     data-text="{{ selector.query }} ({{ selector.get_item_display }})">
+                                    <div class="font-medium">{{ selector.query }}</div>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">{{ selector.get_item_display }} - {{ selector.get_method_display }}</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seed URLs for selected portal (Edit) -->
+                <div>
+                    <label for="edit-seed-url-search" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Seed URLs (by selected portal)</label>
+                    <input type="text" id="edit-seed-url-search"
+                        class="mb-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                        placeholder="Filter seed URLs...">
+                    <div id="edit-seed-url-list" class="max-h-56 overflow-y-auto border border-gray-200 rounded-lg p-2 dark:border-gray-700">
+                        {% for seed in seed_urls %}
+                        <label class="flex items-start space-x-2 py-1 px-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer edit-seed-item" data-portal="{{ seed.portal_id }}">
+                            <input type="checkbox" class="mt-1 edit-seed-checkbox" name="seed_urls" value="{{ seed.url }}">
+                            <span class="text-sm text-gray-700 dark:text-gray-300 break-all">{{ seed.url }}</span>
+                        </label>
+                        {% empty %}
+                        <div class="text-sm text-gray-500 dark:text-gray-400">No seed URLs found. Add some in Seed URLs page.</div>
                         {% endfor %}
-                    </select>
+                    </div>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Only URLs for the selected portal are shown.</p>
                 </div>
 
                 <div>
                     <label for="edit_custom_settings" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Custom Settings</label>
                     <textarea name="custom_settings" id="edit_custom_settings" rows="4"
                         class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                        placeholder='{"extract_images": true, "extract_metadata": true}'></textarea>
+                        placeholder='{"delay": 1, "timeout": 30, "retries": 3} or leave empty for default settings'></textarea>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Enter JSON format settings or leave empty for default settings. Example: {"delay": 1, "timeout": 30}</p>
                 </div>
 
                 <div class="bottom-0 left-0 flex justify-center w-full pb-4 space-x-4 md:px-4 md:absolute">
@@ -542,4 +622,5 @@
 
 {% block extra_js %}
 <script src="{% static 'assets/scraper-configs.js' %}"></script>
+<script src="{% static 'assets/search-dropdown.js' %}"></script>
 {% endblock %}

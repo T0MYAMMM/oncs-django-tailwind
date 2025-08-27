@@ -14,6 +14,7 @@ from django.http import HttpResponse, Http404
 from os import listdir
 from os.path import isfile, join
 from django.conf import settings
+from django.utils import timezone
 
 from django.template  import loader
 
@@ -237,7 +238,7 @@ def create_crawler_task(request):
         except Exception as e:
             print(f"Error creating crawler task: {str(e)}")
     
-    return redirect('tasks:tasks')
+    return redirect('tasks:crawler')
 
 
 def create_scheduled_crawler_task(request):
@@ -268,7 +269,7 @@ def create_scheduled_crawler_task(request):
         except Exception as e:
             print(f"Error creating scheduled crawler task: {str(e)}")
     
-    return redirect('tasks:tasks')
+    return redirect('tasks:crawler')
 
 
 def execute_crawler_task_view(request, task_id):
@@ -289,7 +290,7 @@ def execute_crawler_task_view(request, task_id):
         except Exception as e:
             print(f"Error executing crawler task: {str(e)}")
     
-    return redirect('tasks:tasks')
+    return redirect('tasks:crawler')
 
 
 def execute_scheduled_crawler_task_view(request, scheduled_task_id):
@@ -310,7 +311,7 @@ def execute_scheduled_crawler_task_view(request, scheduled_task_id):
         except Exception as e:
             print(f"Error executing scheduled crawler task: {str(e)}")
     
-    return redirect('tasks:tasks')
+    return redirect('tasks:crawler')
 
 
 # Scrapyd API Views

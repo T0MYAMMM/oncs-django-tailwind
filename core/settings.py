@@ -191,7 +191,15 @@ if DB_ENGINE and DB_NAME and DB_USERNAME:
         'PASSWORD': DB_PASS,
         'HOST'    : DB_HOST,
         'PORT'    : DB_PORT,
-        }, 
+        },
+        'scrapyd_tracking': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'scrapyd_tracking',
+            'USER': 'scrapyd_tracking',
+            'PASSWORD': 'scrapyd_tracking',
+            'HOST': 'localhost',
+            'PORT': '5432',
+        },
     }
 else:
     DATABASES = {
