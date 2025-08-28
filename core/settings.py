@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "apps.users",
     "apps.api",
     "apps.tasks",
+    "messaging"
     "django_celery_results",
 
     'rest_framework',
@@ -291,7 +292,6 @@ ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 # SOCIALACCOUNT_LOGIN_ON_GET=True
 ACCOUNT_UNIQUE_EMAIL = True
 LOGIN_REDIRECT_URL = "/"
-
 
 
 # ### Async Tasks (Celery) Settings ###

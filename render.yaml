@@ -3,7 +3,7 @@ services:
     name: rocket-django-pro-latest
     plan: free
     env: python
-    region: frankfurt  # region should be same as your database region.
+    region: frankfurt  
     buildCommand: "./build.sh"
     startCommand: "gunicorn core.wsgi:application"
     envVars:

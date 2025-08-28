@@ -1,0 +1,203 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrastyle %}
+<style>
+    .kafka-status {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px 0;
+    }
+    .status-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+    .status-item:last-child {
+        border-bottom: none;
+    }
+    .status-label {
+        font-weight: 600;
+        color: #495057;
+    }
+    .status-value {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    .status-connected {
+        background: #d4edda;
+        color: #155724;
+    }
+    .status-disconnected {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    .status-running {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+    .control-buttons {
+        margin: 20px 0;
+    }
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 0 10px 10px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        text-decoration: none;
+        text-align: center;
+    }
+    .btn-primary {
+        background: #007bff;
+        color: white;
+    }
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+    }
+    .btn:hover {
+        opacity: 0.8;
+    }
+    .consumers-list {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 15px;
+        margin: 10px 0;
+    }
+    .consumer-item {
+        background: #e9ecef;
+        padding: 8px 12px;
+        margin: 5px 0;
+        border-radius: 4px;
+        font-family: monospace;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="kafka-status">
+    <h2>Kafka Messaging Service Status</h2>
+    
+    <div id="status-container">
+        <div class="status-item">
+            <span class="status-label">Producer Status:</span>
+            <span id="producer-status" class="status-value">Loading...</span>
+        </div>
+        
+        <div class="status-item">
+            <span class="status-label">Overall Status:</span>
+            <span id="overall-status" class="status-value">Loading...</span>
+        </div>
+        
+        <div class="status-item">
+            <span class="status-label">Total Consumers:</span>
+            <span id="total-consumers" class="status-value">Loading...</span>
+        </div>
+        
+        <div class="status-item">
+            <span class="status-label">Running Consumers:</span>
+            <div id="consumers-list" class="consumers-list">
+                <span>Loading...</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="control-buttons">
+        <button class="btn btn-primary" onclick="startConsumers()">Start All Consumers</button>
+        <button class="btn btn-danger" onclick="stopConsumers()">Stop All Consumers</button>
+        <button class="btn btn-primary" onclick="refreshStatus()">Refresh Status</button>
+    </div>
+</div>
+
+<script>
+function refreshStatus() {
+    fetch('{% url "admin:kafka_status" %}')
+        .then(response => response.json())
+        .then(data => {
+            updateStatusDisplay(data);
+        })
+        .catch(error => {
+            console.error('Error fetching status:', error);
+        });
+}
+
+function startConsumers() {
+    fetch('{% url "admin:start_consumers" %}', {method: 'POST'})
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert(data.message);
+                refreshStatus();
+            } else if (data.error) {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error starting consumers:', error);
+            alert('Error starting consumers');
+        });
+}
+
+function stopConsumers() {
+    if (confirm('Are you sure you want to stop all consumers?')) {
+        fetch('{% url "admin:stop_consumers" %}', {method: 'POST'})
+            .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        alert(data.message);
+                        refreshStatus();
+                    } else if (data.error) {
+                        alert('Error: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error stopping consumers:', error);
+                    alert('Error stopping consumers');
+                });
+    }
+}
+
+function updateStatusDisplay(data) {
+    // Update producer status
+    const producerStatus = document.getElementById('producer-status');
+    producerStatus.textContent = data.producer_connected ? 'Connected' : 'Disconnected';
+    producerStatus.className = 'status-value ' + (data.producer_connected ? 'status-connected' : 'status-disconnected');
+    
+    // Update overall status
+    const overallStatus = document.getElementById('overall-status');
+    overallStatus.textContent = data.running ? 'Running' : 'Stopped';
+    overallStatus.className = 'status-value ' + (data.running ? 'status-running' : 'status-disconnected');
+    
+    // Update total consumers
+    document.getElementById('total-consumers').textContent = data.total_consumers;
+    
+    // Update consumers list
+    const consumersList = document.getElementById('consumers-list');
+    if (data.consumers_running && data.consumers_running.length > 0) {
+        consumersList.innerHTML = data.consumers_running.map(consumer => 
+            `<div class="consumer-item">${consumer}</div>`
+        ).join('');
+    } else {
+        consumersList.innerHTML = '<span>No consumers running</span>';
+    }
+}
+
+// Load status on page load
+document.addEventListener('DOMContentLoaded', function() {
+    refreshStatus();
+    
+    // Auto-refresh every 30 seconds
+    setInterval(refreshStatus, 30000);
+});
+</script>
+{% endblock %}
