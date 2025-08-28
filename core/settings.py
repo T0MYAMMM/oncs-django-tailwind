@@ -50,7 +50,7 @@ INSTALLED_APPS = [
     "apps.users",
     "apps.api",
     "apps.tasks",
-    "messaging"
+    "messaging",
     "django_celery_results",
 
     'rest_framework',

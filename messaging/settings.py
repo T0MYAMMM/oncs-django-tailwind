@@ -37,8 +37,8 @@ KAFKA_CONFIG = {
     
     # Topic Configuration
     'default_topics': {
-        'urls': os.getenv('KAFKA_TOPIC_SCRAPING_RESULTS'),
-        'contents': os.getenv('KAFKA_TOPIC_SCRAPING_REQUESTS')
+        'urls': os.getenv('KAFKA_TOPIC_URLS'),
+        'contents': os.getenv('KAFKA_TOPIC_CONTENTS')
     },
     
     # Consumer Group Configuration
